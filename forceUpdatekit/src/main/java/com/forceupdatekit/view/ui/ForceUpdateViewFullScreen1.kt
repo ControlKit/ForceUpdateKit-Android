@@ -14,6 +14,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,10 +39,15 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
 
     @Composable
     override fun ShowView(config: ForceUpdateViewConfig, response: CheckUpdateResponse) {
-
+        val openDialog = remember { mutableStateOf(false) }
+        if (openDialog.value) return
         Dialog(
-            onDismissRequest = { },
-            properties = DialogProperties(usePlatformDefaultWidth = false)
+            onDismissRequest = { openDialog.value = true },
+
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false, dismissOnClickOutside = false,
+                dismissOnBackPress = false,
+            )
         ) {
             Surface(
                 modifier = config.popupViewLayoutModifier ?: Modifier

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import com.forceupdatekit.theme.Black100
 
 data class ForceUpdateViewConfig(
     var forceUpdateViewStyle:   ForceUpdateViewStyle = ForceUpdateViewStyle.Popover1,
@@ -36,4 +37,28 @@ data class ForceUpdateViewConfig(
     var descriptionTitleView: @Composable (() -> Unit)? = null,
     var versionTitleView: @Composable (() -> Unit)? = null,
     var buttonView: @Composable (() -> Unit)? = null,
-)
+    var noUpdateState: (() -> Unit)? = null,
+
+    var retryViewTitleLayoutModifier:   Modifier? = null,
+    var retryViewTitleView: @Composable (() -> Unit)? = null,
+    var retryViewTitle: String = "Connection Lost",
+    var retryViewTitleColor: Color? = null,
+    var retryViewTryAgainButtonLayoutModifier:   Modifier? = null,
+    var retryViewTryAgainButtonView: @Composable (() -> Unit)? = null,
+    var retryViewTryAgainButtonCornerRadius: Dp? = null,
+    var retryViewTryAgainButtonColor: Color? = null,
+    var retryViewTryAgainButtonTitle: String = "Try Again",
+    var retryViewCancelButtonLayoutModifier:   Modifier? = null,
+    var retryViewCancelButtonView: @Composable (() -> Unit)? = null,
+    var retryViewCancelButtonCornerRadius: Dp? = null,
+    var retryViewCancelButtonColor: Color? = null,
+    var retryViewCancelButtonTitle: String = "Cancel",
+    var retryViewImageLayoutModifier:   Modifier? = null,
+    var retryViewImageView: @Composable (() -> Unit)? = null,
+    var retryViewUpdateImageDrawble:   Int? = null,
+    var retryViewImageColor:   Color = Black100,
+    var retryViewSpace:   @Composable (() -> Unit)? = null,
+    var retryViewCancelButton: (() -> Unit)? = null,
+
+
+    )

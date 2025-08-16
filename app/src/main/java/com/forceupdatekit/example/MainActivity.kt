@@ -1,6 +1,7 @@
 package com.forceupdatekit.example
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -45,9 +46,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-//                    Example2()
+                    Example2()
 
-                    WaveClipView()
+//                    WaveClipView()
                 }
 
             }
@@ -122,7 +123,8 @@ fun WaveClipView() {
             .background(Color.Black)
     ) {
         Column(
-            Modifier.padding(top = 100.dp)
+            Modifier
+                .padding(top = 100.dp)
                 .fillMaxWidth()
                 .background(Color.Red)
                 .fillMaxHeight(0.7f)
@@ -131,7 +133,8 @@ fun WaveClipView() {
             Surface(
                 modifier = Modifier
                     .height(80.dp)
-                    .width(85.dp) .offset(y = (-20).dp),
+                    .width(85.dp)
+                    .offset(y = (-20).dp),
                 shape = RoundedCornerShape(55.dp),
                 color = Color.Red,
 

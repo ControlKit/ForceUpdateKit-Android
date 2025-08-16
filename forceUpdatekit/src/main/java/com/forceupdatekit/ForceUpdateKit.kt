@@ -1,69 +1,52 @@
 package com.forceupdatekit
 
-import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.example.demoapp.models.CheckUpdateResponse
-import com.example.testcreatelibrary.ui.view.data.ApiService
-import com.example.testcreatelibrary.ui.view.data.RetrofitClientInstance
+import androidx.compose.runtime.collectAsState
+import com.contactsupportkit.view.viewModel.ForceUpdateViewModel
 import com.forceupdatekit.config.ForceUpdateServiceConfig
 import com.forceupdatekit.view.config.ForceUpdateViewStyle
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.forceupdatekit.view.ui.RetryView
+import com.forceupdatekit.view.viewModel.state.ForceUpdateState
 
 
 class ForceUpdateKit(
     private var config: ForceUpdateServiceConfig = ForceUpdateServiceConfig(),
+    private val forceUpdateViewModel: ForceUpdateViewModel = ForceUpdateViewModel()
 ) {
-
-    private fun checkForceUpdate(callBack: (data: CheckUpdateResponse?) -> Unit) {
-        val retrofit = RetrofitClientInstance.retrofitInstance
-        val apiInterface = retrofit?.create(ApiService::class.java)
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = apiInterface?.getData(
-                    config.route,
-                    appId = config.appId,
-                    language = config.language,
-                    version = config.version
-                )
-                if (response?.isSuccessful == true) {
-                    callBack.invoke(response.body())
-                }
-            } catch (Ex: Exception) {
-                Log.e("Error", "$Ex")
-            }
-        }
-
-    }
 
 
     @Composable
     fun Configure() {
-        val checkUpdateResponse: CheckUpdateResponse? = null
 
-        var responceState by remember { mutableStateOf(checkUpdateResponse) }
-        checkForceUpdate {
-            if (responceState == null)
-                responceState = it
-        }
+        val state = forceUpdateViewModel.state.collectAsState().value
 
-        if (responceState != null) {
-            responceState?.let {
-                ForceUpdateViewStyle.checkViewStyle(config.viewConfig.forceUpdateViewStyle)
-                    .ShowView(config = config.viewConfig, it)
+        when (state) {
+
+            ForceUpdateState.Initial -> Unit
+
+            ForceUpdateState.NoUpdate -> {
+                config.viewConfig.noUpdateState?.invoke()
+            }
+
+            is ForceUpdateState.Update -> {
+                state.data?.let {
+                    ForceUpdateViewStyle.checkViewStyle(config.viewConfig.forceUpdateViewStyle)
+                        .ShowView(config = config.viewConfig, it)
+
+                }
 
             }
 
-
+            is ForceUpdateState.Error -> {
+                RetryView(config.viewConfig, tryAgain = {
+                    forceUpdateViewModel.tryAgain()
+                })
+            }
         }
 
-
     }
+
+
 }
 
 

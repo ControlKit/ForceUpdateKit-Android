@@ -42,7 +42,7 @@ class ForceUpdateViewPopover2 : ForceUpdateViewContract {
             Surface(
                 modifier = config.popupViewLayoutModifier ?: Modifier
                     .fillMaxHeight(0.7f)
-                    .fillMaxWidth(8f),
+                    .fillMaxWidth(0.8f),
                 shape = RoundedCornerShape(config.popupViewCornerRadius ?: 15.dp),
                 color = config.popupViewBackGroundColor ?: Black100
             ) {

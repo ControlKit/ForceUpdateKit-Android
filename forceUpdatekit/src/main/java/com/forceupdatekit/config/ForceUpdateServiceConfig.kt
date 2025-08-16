@@ -8,10 +8,11 @@ import com.forceupdatekit.view.config.ForceUpdateViewConfig
 
 data class ForceUpdateServiceConfig(
     var viewConfig: ForceUpdateViewConfig = ForceUpdateViewConfig(),
-    var route: String = "https://my.api.mockaroo.com/forceupdate.json?key=2202ab40",
+    var route: String = "http://135.181.38.185:8001/api/force-updates",
     var packageName: String? = null,
     var version: String = "0.0.0",
     var appId: String = "Android",
     var language: String? = "en",
+    var deviceId: String="1"
 
     )
