@@ -1,4 +1,4 @@
-package com.forceupdatekit.service
+package com.forceupdatekit.service.model
 
 data class UpdateRequest(  var appId: String? = null,
  var version: String ,

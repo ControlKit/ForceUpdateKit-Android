@@ -1,6 +1,5 @@
 package com.forceupdatekit.view.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -68,7 +66,7 @@ fun RetryView(config: ForceUpdateViewConfig, tryAgain: (() -> Unit)? = null) {
                     )
                 )
 
-                ButtonTryAgain(config,tryAgain,openDialog)
+                ButtonTryAgain(config, tryAgain, openDialog)
                 ButtonCancel(config, openDialog)
             }
         }
@@ -82,7 +80,7 @@ fun RetryView(config: ForceUpdateViewConfig, tryAgain: (() -> Unit)? = null) {
 private fun ImageView(config: ForceUpdateViewConfig) {
     Surface(
         modifier = config.retryViewImageLayoutModifier ?: Modifier
-            .padding(top = LocalConfiguration.current.screenHeightDp.dp * 0.05f)
+            .padding(top = 40.dp)
             .width(100.dp)
             .height(100.dp),
         color = Color.Transparent,
@@ -107,7 +105,7 @@ private fun Title(
     Surface(
         modifier = config.retryViewTitleLayoutModifier ?: Modifier
             .padding(
-                top = LocalConfiguration.current.screenHeightDp.dp * 0.10f,
+                top = 60.dp,
                 end = 15.dp,
                 start = 15.dp
             )
@@ -132,9 +130,10 @@ private fun ButtonTryAgain(
     tryAgain: (() -> Unit)?,
     openDialog: MutableState<Boolean>,
 ) {
-    Surface(modifier = config.retryViewTryAgainButtonLayoutModifier ?: Modifier
-        .padding(top = LocalConfiguration.current.screenHeightDp.dp * 0.10f)
-        .wrapContentSize(),
+    Surface(
+        modifier = config.retryViewTryAgainButtonLayoutModifier ?: Modifier
+            .padding(top = 60.dp)
+            .wrapContentSize(),
         color = Color.Transparent,
         onClick = {
             openDialog.value = true
@@ -181,12 +180,13 @@ private fun ButtonCancel(
     config: ForceUpdateViewConfig,
     openDialog: MutableState<Boolean>,
 ) {
-    Surface(modifier = config.retryViewCancelButtonLayoutModifier ?: Modifier
-        .padding(
-            top = LocalConfiguration.current.screenHeightDp.dp * 0.02f,
-            bottom = 48.dp
-        )
-        .wrapContentSize(),
+    Surface(
+        modifier = config.retryViewCancelButtonLayoutModifier ?: Modifier
+            .padding(
+                top = 15.dp,
+                bottom = 48.dp
+            )
+            .wrapContentSize(),
         color = Color.Transparent,
         onClick = {
             openDialog.value = true

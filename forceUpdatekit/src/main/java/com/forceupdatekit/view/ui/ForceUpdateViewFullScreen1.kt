@@ -1,48 +1,52 @@
 package com.forceupdatekit.view.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.demoapp.models.CheckUpdateResponse
+import coil.compose.AsyncImage
+import com.forceupdatekit.service.model.CheckUpdateResponse
 import com.forceupdatekit.R
 import com.forceupdatekit.theme.Blue60
 import com.forceupdatekit.theme.Typography
 import com.forceupdatekit.theme.White100
-import com.forceupdatekit.theme.White60
+import com.forceupdatekit.util.Utils.openLink
 import com.forceupdatekit.view.config.ForceUpdateViewConfig
 import com.forceupdatekit.view.config.ForceUpdateViewContract
+import com.forceupdatekit.view.viewmodel.ForceUpdateViewModel
 
 class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
 
     @Composable
-    override fun ShowView(config: ForceUpdateViewConfig, response: CheckUpdateResponse) {
-        val openDialog = remember { mutableStateOf(false) }
+    override fun ShowView(
+        config: ForceUpdateViewConfig,
+        response: CheckUpdateResponse,
+        viewModel: ForceUpdateViewModel
+    ) {
+        val openDialog = viewModel.openDialog.collectAsState()
         if (openDialog.value) return
         Dialog(
-            onDismissRequest = { openDialog.value = true },
+            onDismissRequest = { viewModel.dismissDialog() },
 
             properties = DialogProperties(
                 usePlatformDefaultWidth = false, dismissOnClickOutside = false,
@@ -50,19 +54,20 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
             )
         ) {
             Surface(
-                modifier = config.popupViewLayoutModifier ?: Modifier
-                    .fillMaxSize(),
+                modifier = config.popupViewLayoutModifier ?: Modifier.fillMaxSize(),
                 color = config.popupViewBackGroundColor ?: White100
 
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.fillMaxSize(), Arrangement.Top, Alignment.CenterHorizontally
                 ) {
-                    ImageView(config)
-                    DescriptionTitle(config, response)
-                    ButtonUpdate(config, response)
+                    ImageView(config, Modifier.weight(3f), response)
+                    DescriptionTitle(
+                        config,
+                        response,
+                        Modifier.weight(2f),
+                    )
+                    ButtonUpdate(config, response, Modifier.weight(5f),viewModel)
                 }
             }
 
@@ -72,19 +77,36 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
 
 
     @Composable
-    private fun ImageView(config: ForceUpdateViewConfig) {
-        Surface(
-            modifier = config.updateImageLayoutModifier ?: Modifier
-                .padding(top = LocalConfiguration.current.screenHeightDp.dp * 0.25f)
-                .wrapContentSize(),
-            color = Color.Transparent,
+    private fun ImageView(
+        config: ForceUpdateViewConfig, modifier: Modifier, response: CheckUpdateResponse
+    ) {
 
-            ) {
-            if (config.imageView != null) config.imageView?.let { it() } else Icon(
-                painter = painterResource(id = config.updateImageDrawble ?: R.drawable.spaceship),
+        Box(
+            modifier = config.imageLayoutModifier ?: modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+
+
+            config.imageView?.let { imageView ->
+                response.iconUrl?.let { imageView(it) }
+            } ?: if (config.imageDrawble != null) Image(
+                painter = painterResource(
+                    id = config.imageDrawble!!
+                ),
+                contentScale = config.contentScaleImageDrawble ?: ContentScale.Fit,
                 contentDescription = null,
-                tint = config.updateImageColor ?: White60
+            ) else AsyncImage(
+                model = response.iconUrl,
+                contentDescription = null,
+                placeholder = if (config.placeholderImageDrawble == null) null else painterResource(
+                    config.placeholderImageDrawble!!
+                ),
+                contentScale = config.contentScaleImageDrawble ?: ContentScale.Fit,
+                error = painterResource(
+                    id = config.errorImageDrawble ?: R.drawable.space_ship_cloud
+                ),
             )
+
         }
 
     }
@@ -93,27 +115,27 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
     @Composable
     private fun DescriptionTitle(
         config: ForceUpdateViewConfig,
-        response: CheckUpdateResponse
-
+        response: CheckUpdateResponse,
+        modifier: Modifier,
     ) {
-        Surface(
-            modifier = config.descriptionTitleLayoutModifier ?: Modifier
+        Box(
+            modifier = config.descriptionTitleLayoutModifier ?: modifier
                 .padding(
-                    top = LocalConfiguration.current.screenHeightDp.dp * 0.10f,
-                    end = 15.dp,
-                    start = 15.dp
+                    end = 15.dp, start = 15.dp
                 )
-                .wrapContentSize(),
-            color = Color.Transparent,
+                .wrapContentSize(), contentAlignment = Alignment.Center
 
-            ) {
-            config.descriptionTitleView ?: Text(
-                text = response.description
-                    ?: config.descriptionTitle,
+        ) {
+            config.descriptionTitleView?.let { textView ->
+                textView((response.description ?: config.descriptionTitle))
+            } ?: Text(
+                text = response.description ?: config.descriptionTitle,
                 style = Typography.titleSmall,
                 color = config.descriptionTitleColor ?: Typography.titleSmall.color
 
             )
+
+
         }
 
     }
@@ -122,56 +144,43 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
     @Composable
     private fun ButtonUpdate(
         config: ForceUpdateViewConfig,
-        response: CheckUpdateResponse
+        response: CheckUpdateResponse,
+        modifier: Modifier,
+        viewModel: ForceUpdateViewModel
     ) {
         val uriHandler = LocalUriHandler.current
-        Surface(modifier = config.updateButtonLayoutModifier ?: Modifier
-            .padding(top = LocalConfiguration.current.screenHeightDp.dp * 0.10f)
-            .wrapContentSize(),
-            color = Color.Transparent,
-            onClick = {
-                response.linkUrl?.let {
-                    openLink(
-                        it,
-                        uriHandler
-                    )
-                }
-
-            }
+        Box(
+            modifier = config.buttonLayoutModifier ?: modifier.fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
 
         ) {
 
-            if (config.buttonView != null) config.buttonView?.let { it() } else ElevatedCard(
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 0.dp
-                ),
-                shape = RoundedCornerShape(config.updateButtonCornerRadius ?: 18.dp),
-
-                colors = CardDefaults.cardColors(
-                    containerColor = config.updateButtonColor ?: Blue60,
-
-                    ),
-                modifier = Modifier
-                    .size(height = 48.dp, width = 182.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = config.updateButtonTitle ?: ("Update New Version"),
-                        style = Typography.titleMedium
-                    )
-                }
+            val onClickAction: () -> Unit = {
+                openLink(response.linkUrl, uriHandler)
+                viewModel.dismissDialog()
+                viewModel.clearState()
             }
+
+            config.buttonView?.let { button ->
+                button(onClickAction)
+            } ?: Button(
+                onClick = onClickAction,
+                shape = RoundedCornerShape(config.buttonCornerRadius ?: 18.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = config.buttonColor ?: Blue60
+                ),
+                modifier = Modifier.size(width = 182.dp, height = 48.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+            ) {
+                Text(
+                    text = response.buttonTitle ?: config.buttonTitle,
+                    style = Typography.titleMedium
+                )
+            }
+
         }
 
     }
 
-    private fun openLink(url: String, uriHandler: UriHandler) {
-        uriHandler.openUri(url)
-    }
 
 }

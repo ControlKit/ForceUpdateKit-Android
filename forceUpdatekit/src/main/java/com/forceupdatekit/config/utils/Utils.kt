@@ -1,8 +1,8 @@
-package com.joon.fm
+package com.forceupdatekit.config.utils
 
 import com.google.gson.Gson
-import com.joon.fm.core.base.errorEntity.ApiErrorEntity
-import com.joon.fm.data.source.remote.ApiError
+import com.forceupdatekit.service.apiError.ApiErrorEntity
+import com.forceupdatekit.service.apiError.ApiError
 import org.json.JSONException
 import java.io.IOException
 

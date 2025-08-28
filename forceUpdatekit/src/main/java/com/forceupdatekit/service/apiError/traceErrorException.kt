@@ -1,12 +1,6 @@
-package com.joon.fm.core.base.baseUsecase
+package com.forceupdatekit.service.apiError
 
-import android.util.Log
-import com.google.gson.Gson
-import com.joon.fm.convertErrorBody
-import com.joon.fm.core.base.errorEntity.ApiErrorEntity
-import com.joon.fm.data.source.remote.ApiError
-import com.joon.fm.data.source.remote.UNKNOWN_ERROR_MESSAGE
-import org.json.JSONException
+import com.forceupdatekit.config.utils.convertErrorBody
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
@@ -24,6 +18,11 @@ fun traceErrorException(throwable: Throwable?): ApiError {
                     throwable.message(),
                     throwable.code(),
                     ApiError.ErrorStatus.FORBIDDEN
+                )
+                400 -> ApiError(
+                    throwable.message(),
+                    throwable.code(),
+                    ApiError.ErrorStatus.DATA_ERROR
                 )
 
 

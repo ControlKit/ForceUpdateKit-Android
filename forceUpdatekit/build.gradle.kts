@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.10"
     id("maven-publish")
 
 }
@@ -59,20 +59,32 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.viewmodel.android)
+    implementation(libs.ui.tooling.preview)
+
+    implementation(libs.coil.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    //REST - APIService
+
+    implementation (libs.retrofit)
+    implementation(libs.logging.interceptor)
+    implementation(libs.okhttp)
+    implementation (libs.converter.gson)
+    debugImplementation(libs.ui.tooling)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotlinx.coroutines.test)
 
-    //REST - APIService
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
 }
 publishing {
     publications {
         register<MavenPublication>("release") {
             groupId = "com.github.Morteza-Sakiyan"
             artifactId = "create1"
-            version = "0.0.1"
+            version = "0.0.2"
 
             afterEvaluate {
                 from(components["release"])

@@ -8,11 +8,11 @@ import com.forceupdatekit.view.config.ForceUpdateViewConfig
 
 data class ForceUpdateServiceConfig(
     var viewConfig: ForceUpdateViewConfig = ForceUpdateViewConfig(),
-    var route: String = "http://135.181.38.185:8001/api/force-updates",
+    var route: String = "http/api/force-updates",
     var packageName: String? = null,
     var version: String = "0.0.0",
     var appId: String = "Android",
-    var language: String? = "en",
-    var deviceId: String="1"
+    var deviceId: String="1",
+    var sdkVersion: String="1"
 
     )

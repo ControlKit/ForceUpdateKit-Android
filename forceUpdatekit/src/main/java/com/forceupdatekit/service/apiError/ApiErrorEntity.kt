@@ -1,4 +1,4 @@
-package com.joon.fm.core.base.errorEntity
+package com.forceupdatekit.service.apiError
 
 class ApiErrorEntity {
         data class Main(

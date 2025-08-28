@@ -1,7 +1,7 @@
-package com.forceupdatekit.view.viewModel.state
+package com.forceupdatekit.view.viewmodel.state
 
-import com.example.demoapp.models.CheckUpdateResponse
-import com.joon.fm.data.source.remote.ApiError
+import com.forceupdatekit.service.model.CheckUpdateResponse
+import com.forceupdatekit.service.apiError.ApiError
 
 sealed class ForceUpdateState {
     object Initial : ForceUpdateState()
