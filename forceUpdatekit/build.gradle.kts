@@ -78,16 +78,13 @@ dependencies {
 
 }
 
-
-
-// Task Jacoco برای تولید گزارش دقیق در مسیر دلخواه
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn(tasks.named("testDebugUnitTest"))
+    dependsOn("testDebugUnitTest")
 
     reports {
-        xml.required.set(true)
         html.required.set(true)
-        html.outputLocation.set(file("${buildDir}/reports/jacoco/jacocoTestReport/html"))
+        xml.required.set(true)
+        html.outputLocation.set(file("$buildDir/reports/jacoco/jacocoTestReport/html"))
     }
 
     val fileFilter = listOf(
@@ -98,13 +95,16 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/*Test*.*"
     )
 
-    val javaClasses = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+    classDirectories.setFrom(fileTree("$buildDir/tmp/kotlin-classes/debug") {
         exclude(fileFilter)
-    }
+    })
 
-    classDirectories.setFrom(javaClasses)
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+
     executionData.setFrom(fileTree(buildDir) {
-        include("**/jacoco/*.exec")
+        include(
+            "jacoco/testDebugUnitTest.exec",
+            "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
+        )
     })
 }
