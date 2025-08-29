@@ -2,10 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.10"
-    jacoco
-}
-jacoco {
-    toolVersion = "0.8.10"
+    id("jacoco")
 }
 
 android {
@@ -80,6 +77,11 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
 }
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+// ✅ تسک گزارش کاورج
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -89,16 +91,26 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         csv.required.set(false)
     }
 
-    val fileTree = fileTree("${buildDir}/jacoco") {
-        include("**/testDebugUnitTest.exec")
-    }
+    // مسیر سورس
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
 
+    // کلاس‌های کامپایل‌شده
     classDirectories.setFrom(
         fileTree("${buildDir}/intermediates/javac/debug") {
-            exclude("**/R.class", "**/R\$*.class", "**/BuildConfig.*", "**/Manifest*.*")
+            exclude(
+                "**/R.class",
+                "**/R\$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*"
+            )
         }
     )
 
-    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-    executionData.setFrom(fileTree)
+    // داده‌های اجرایی JaCoCo
+    executionData.setFrom(
+        fileTree(buildDir) {
+            include("**/jacoco/testDebugUnitTest.exec")
+        }
+    )
 }
