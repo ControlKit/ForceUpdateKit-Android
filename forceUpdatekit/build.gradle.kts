@@ -83,8 +83,14 @@ jacoco {
     toolVersion = "0.8.10"
 }
 tasks.withType<Test> {
-    useJUnit()
-    finalizedBy("jacocoTestReport")
+    // فعلاً JUnit 4 استفاده می‌کنی، پس useJUnitPlatform لازم نیست
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.11"
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
@@ -95,28 +101,20 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    val mainSrc = files(
-        "${project.projectDir}/src/main/java",
-        "${project.projectDir}/src/main/kotlin"
-    )
+    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude("**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*")
+    }
 
-    val debugTree = files(
-        fileTree("${buildDir}/tmp/kotlin-classes/debug") {
-            exclude("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
-        },
-        fileTree("${buildDir}/intermediates/javac/debug/classes") {
-            exclude("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
-        }
-    )
-
-    sourceDirectories.setFrom(mainSrc)
     classDirectories.setFrom(debugTree)
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
     executionData.setFrom(fileTree(buildDir) {
-        include("**/*.exec", "**/*.ec")
+        include("**/jacoco/testDebugUnitTest.exec")
     })
 }
-
-
 
 tasks.register("printCoverage") {
     dependsOn("jacocoTestReport")

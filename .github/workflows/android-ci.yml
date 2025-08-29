@@ -31,16 +31,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
+      # فقط تست‌های همین ماژول
       - name: Run tests (ForceUpdateKit)
         run: ./gradlew :forceUpdatekit:testDebugUnitTest --stacktrace
 
+      # ساخت گزارش کاورج فقط برای این ماژول
       - name: Generate JaCoCo report (ForceUpdateKit)
         run: ./gradlew :forceUpdatekit:jacocoTestReport
 
-      - name: Print coverage (ForceUpdateKit)
+      # چاپ درصد کلی کاورج همین ماژول
+      - name: Print coverage percentage
         run: ./gradlew :forceUpdatekit:printCoverage
 
-      - name: Upload JaCoCo HTML report (ForceUpdateKit)
+      # آپلود گزارش HTML همین ماژول
+      - name: Upload JaCoCo HTML report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
