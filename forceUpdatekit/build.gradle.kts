@@ -82,9 +82,9 @@ dependencies {
 jacoco {
     toolVersion = "0.8.10"
 }
-// اطمینان از اجرای jacoco بعد تست‌ها
+
 tasks.withType<Test> {
-    useJUnit() // چون گفتی تست‌هات JUnit4 هستن
+    useJUnit()
     finalizedBy("jacocoTestReport")
 }
 
@@ -96,11 +96,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    // مسیر سورس کد
     val mainSrc = "${project.projectDir}/src/main/java"
 
-    // کلاس‌ها (به‌جز فایل‌های اتوماتیک Android)
-    val debugTree = fileTree("${buildDir}/intermediates/javac/debug") {
+    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
         exclude(
             "**/R.class",
             "**/R$*.class",

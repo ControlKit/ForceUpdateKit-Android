@@ -39,7 +39,7 @@ jobs:
       - name: Generate JaCoCo report
         run: ./gradlew :forceUpdatekit:jacocoTestReport
 
-      # گزارش تست‌ها (برای debug در صورت fail شدن)
+      # گزارش تست‌ها (برای بررسی fail ها)
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
