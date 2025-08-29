@@ -84,7 +84,8 @@ jacoco {
 }
 
 tasks.withType<Test> {
-    // چون لوکال با JUnit4 جواب میده، دیگه useJUnitPlatform() نمی‌ذاریم
+    // چون تست‌ها JUnit4 هستن
+    useJUnit()
     finalizedBy("jacocoTestReport")
 }
 
@@ -96,42 +97,37 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug")
-    val mainSrc = "${project.projectDir}/src/main/java"
+    // سورس‌های Java + Kotlin
+    val mainSrc = files(
+        "${project.projectDir}/src/main/java",
+        "${project.projectDir}/src/main/kotlin"
+    )
 
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(files("${buildDir}/jacoco/testDebugUnitTest.exec"))
-}
-
-// برای پرینت درصد کلی کاورج
-tasks.register("printCoverage") {
-    dependsOn("jacocoTestReport")
-    doLast {
-        val reportFile = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-        if (!reportFile.exists()) {
-            println("⚠️ Coverage report not found")
-            return@doLast
+    // کلاس‌های خروجی Kotlin + Java (برای AGP 8+ هر دو مسیر رو پوشش می‌دیم)
+    val debugTree = files(
+        fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+            exclude(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*"
+            )
+        },
+        fileTree("${buildDir}/intermediates/javac/debug/classes") {
+            exclude(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*"
+            )
         }
+    )
 
-        val xml = DocumentBuilderFactory.newInstance()
-            .newDocumentBuilder()
-            .parse(reportFile)
-        xml.documentElement.normalize()
-
-        val counters = xml.getElementsByTagName("counter")
-        var covered = 0
-        var missed = 0
-        for (i in 0 until counters.length) {
-            val node = counters.item(i)
-            val type = node.attributes.getNamedItem("type").nodeValue
-            if (type == "INSTRUCTION") {
-                covered += node.attributes.getNamedItem("covered").nodeValue.toInt()
-                missed += node.attributes.getNamedItem("missed").nodeValue.toInt()
-            }
-        }
-        val total = covered + missed
-        val percent = if (total == 0) 0.0 else (covered * 100.0 / total)
-        println("📊 ForceUpdateKit coverage: ${"%.2f".format(percent)}%")
-    }
+    sourceDirectories.setFrom(mainSrc)
+    classDirectories.setFrom(debugTree)
+    executionData.setFrom(fileTree(buildDir) {
+        include("**/*.exec", "**/*.ec")
+    })
 }
