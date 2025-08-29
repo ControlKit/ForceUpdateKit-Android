@@ -82,15 +82,10 @@ dependencies {
 jacoco {
     toolVersion = "0.8.10"
 }
-tasks.withType<Test> {
-    // فعلاً JUnit 4 استفاده می‌کنی، پس useJUnitPlatform لازم نیست
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
-}
 
-jacoco {
-    toolVersion = "0.8.11"
+tasks.withType<Test> {
+    // چون لوکال با JUnit4 جواب میده، دیگه useJUnitPlatform() نمی‌ذاریم
+    finalizedBy("jacocoTestReport")
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
@@ -101,52 +96,42 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
-        exclude("**/R.class",
-            "**/R$*.class",
-            "**/BuildConfig.*",
-            "**/Manifest*.*",
-            "**/*Test*.*")
-    }
+    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug")
+    val mainSrc = "${project.projectDir}/src/main/java"
 
-    classDirectories.setFrom(debugTree)
-    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-    executionData.setFrom(fileTree(buildDir) {
-        include("**/jacoco/testDebugUnitTest.exec")
-    })
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(files("${buildDir}/jacoco/testDebugUnitTest.exec"))
 }
 
+// برای پرینت درصد کلی کاورج
 tasks.register("printCoverage") {
     dependsOn("jacocoTestReport")
     doLast {
-        val reportFile = file("${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        val reportFile = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
         if (!reportFile.exists()) {
-            println("⚠️ Jacoco XML report not found at: ${reportFile.absolutePath}")
+            println("⚠️ Coverage report not found")
             return@doLast
         }
 
-        val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
-        factory.isValidating = false
-        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+        val xml = DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(reportFile)
+        xml.documentElement.normalize()
 
-        val parser = factory.newDocumentBuilder()
-        val doc = parser.parse(reportFile)
-        val counters = doc.getElementsByTagName("counter")
-
+        val counters = xml.getElementsByTagName("counter")
         var covered = 0
         var missed = 0
         for (i in 0 until counters.length) {
             val node = counters.item(i)
             val type = node.attributes.getNamedItem("type").nodeValue
             if (type == "INSTRUCTION") {
-                covered = node.attributes.getNamedItem("covered").nodeValue.toInt()
-                missed = node.attributes.getNamedItem("missed").nodeValue.toInt()
-                break
+                covered += node.attributes.getNamedItem("covered").nodeValue.toInt()
+                missed += node.attributes.getNamedItem("missed").nodeValue.toInt()
             }
         }
-
         val total = covered + missed
-        val percent = if (total > 0) covered * 100.0 / total else 0.0
+        val percent = if (total == 0) 0.0 else (covered * 100.0 / total)
         println("📊 ForceUpdateKit coverage: ${"%.2f".format(percent)}%")
     }
 }
