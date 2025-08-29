@@ -77,41 +77,37 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
 }
-tasks.withType<Test> {
-    useJUnit()
-    finalizedBy("jacocoTestReport") // پس از هر تست، Jacoco Report تولید شود
-}
-
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn(tasks.withType<Test>())
+    dependsOn("testDebugUnitTest") // یا testReleaseUnitTest بسته به نیاز
 
     reports {
         html.required.set(true)
         xml.required.set(true)
-        html.outputLocation.set(file("$buildDir/reports/jacoco/html"))
+        csv.required.set(false)
     }
 
-    val classFiles = fileTree("$buildDir/tmp/kotlin-classes/debug") {
-        exclude(
-            "**/R.class",
-            "**/R\$*.class",
-            "**/BuildConfig.*",
-            "**/Manifest*.*",
-            "**/*Test*.*"
-        )
-    } + fileTree("$buildDir/intermediates/javac/debug/classes") {
-        exclude(
-            "**/R.class",
-            "**/R\$*.class",
-            "**/BuildConfig.*",
-            "**/Manifest*.*",
-            "**/*Test*.*"
-        )
+    val fileTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude("**/R.class", "**/R\$*.class", "**/BuildConfig.*", "**/Manifest*.*")
     }
 
-    classDirectories.setFrom(classFiles)
+    classDirectories.setFrom(fileTree)
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-    executionData.setFrom(fileTree(buildDir) {
-        include("jacoco/*.exec", "outputs/unit_test_code_coverage/**/*.exec")
-    })
+    executionData.setFrom(fileTree("${buildDir}/jacoco/testDebugUnitTest.exec"))
+
+    doLast {
+        println("Jacoco HTML report: ${reports.html.outputLocation.get().asFile}")
+        println("Jacoco XML report: ${reports.xml.outputLocation.get().asFile}")
+    }
+}
+
+tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn("jacocoTestReport")
+
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80.toBigDecimal() // حداقل 80٪
+            }
+        }
+    }
 }
