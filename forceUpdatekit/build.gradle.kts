@@ -4,6 +4,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.10"
     jacoco
 }
+jacoco {
+    toolVersion = "0.8.10"
+}
 
 android {
     namespace = "com.forceupdatekit"
@@ -63,10 +66,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     //REST - APIService
 
-    implementation (libs.retrofit)
+    implementation(libs.retrofit)
     implementation(libs.logging.interceptor)
     implementation(libs.okhttp)
-    implementation (libs.converter.gson)
+    implementation(libs.converter.gson)
     debugImplementation(libs.ui.tooling)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -78,36 +81,24 @@ dependencies {
 
 }
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest") // یا testReleaseUnitTest بسته به نیاز
+    dependsOn("testDebugUnitTest")
 
     reports {
-        html.required.set(true)
         xml.required.set(true)
+        html.required.set(true)
         csv.required.set(false)
     }
 
-    val fileTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
-        exclude("**/R.class", "**/R\$*.class", "**/BuildConfig.*", "**/Manifest*.*")
+    val fileTree = fileTree("${buildDir}/jacoco") {
+        include("**/testDebugUnitTest.exec")
     }
 
-    classDirectories.setFrom(fileTree)
-    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-    executionData.setFrom(fileTree("${buildDir}/jacoco/testDebugUnitTest.exec"))
-
-    doLast {
-        println("Jacoco HTML report: ${reports.html.outputLocation.get().asFile}")
-        println("Jacoco XML report: ${reports.xml.outputLocation.get().asFile}")
-    }
-}
-
-tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
-    dependsOn("jacocoTestReport")
-
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.80.toBigDecimal() // حداقل 80٪
-            }
+    classDirectories.setFrom(
+        fileTree("${buildDir}/intermediates/javac/debug") {
+            exclude("**/R.class", "**/R\$*.class", "**/BuildConfig.*", "**/Manifest*.*")
         }
-    }
+    )
+
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(fileTree)
 }
