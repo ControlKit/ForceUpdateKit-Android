@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.10"
-    id("maven-publish")
+//    id("maven-publish")
 
 }
 
@@ -31,12 +31,12 @@ android {
             )
         }
     }
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
+//    publishing {
+//        singleVariant("release") {
+//            withSourcesJar()
+//            withJavadocJar()
+//        }
+//    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -79,16 +79,30 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
 }
-publishing {
-    publications {
-        register<MavenPublication>("release") {
-            groupId = "com.github.Morteza-Sakiyan"
-            artifactId = "create1"
-            version = "0.0.2"
-
-            afterEvaluate {
-                from(components["release"])
-            }
-        }
-    }
-}
+//publishing {
+//    publications {
+//        create<MavenPublication>("release") {
+//            groupId = "com.github.Morteza-Sakiyan"
+//            artifactId = "ForceUpdateKit-Android"
+//            version = "0.0.4"
+//
+//            // از afterEvaluate فقط برای دسترسی به component استفاده می‌کنیم
+//            afterEvaluate {
+//                from(components["release"])
+//            }
+//        }
+//    }
+//
+//    repositories {
+//        maven {
+//            name = "GitHubPackages"
+//            url = uri("https://maven.pkg.github.com/Morteza-Sakiyan/ForceUpdateKit-Android")
+//            credentials {
+//                username = project.findProperty("gpr.user") as String?
+//                    ?: System.getenv("GITHUB_USERNAME")
+//                password = project.findProperty("gpr.token") as String?
+//                    ?: System.getenv("GITHUB_TOKEN")
+//            }
+//        }
+//    }
+//}
