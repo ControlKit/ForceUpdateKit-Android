@@ -31,18 +31,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      - name: Run tests
-        run: ./gradlew clean testDebugUnitTest --stacktrace
+      # ✅ اجرای درست تست ها برای ماژول forceUpdatekit
+      - name: Run unit tests
+        run: ./gradlew clean :forceUpdatekit:testDebugUnitTest --stacktrace
 
+      # ✅ تولید گزارش کاورج برای همون ماژول
       - name: Generate JaCoCo report
-        run: ./gradlew jacocoTestReport
+        run: ./gradlew :forceUpdatekit:jacocoTestReport
 
+      # ✅ پرینت درصد کاورج از تسک سفارشی
       - name: Print coverage percentage
-        run: ./gradlew printCoverage
+        run: ./gradlew :forceUpdatekit:printCoverage
 
+      # ✅ آپلود گزارش HTML
       - name: Upload JaCoCo HTML report
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: '**/build/reports/jacoco/jacocoTestReport/html'
+          path: forceUpdatekit/build/reports/jacoco/jacocoTestReport/html
           if-no-files-found: error
