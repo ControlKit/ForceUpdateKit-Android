@@ -1,4 +1,4 @@
-name: ForceUpdateKit CI Debug
+name: ForceUpdateKit CI
 
 on:
   push:
@@ -33,20 +33,20 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
 
+    - name: Build forceupdatekit module
+      run: ./gradlew :forceupdatekit:assembleDebug --stacktrace
+
     - name: Run Unit Tests (forceupdatekit module)
       run: ./gradlew :forceupdatekit:testDebugUnitTest --stacktrace
-
-    - name: Debug build folder (find Jacoco exec)
-      run: ls -R forceupdatekit/build
 
     - name: Generate Jacoco Coverage Report
       run: ./gradlew :forceupdatekit:jacocoTestReport --rerun-tasks --stacktrace
 
-    - name: Debug Jacoco folder (after report)
+    - name: Debug Jacoco folder (optional)
       run: ls -R forceupdatekit/build/reports/jacoco/
 
-    - name: Upload Jacoco Report as Artifact (if exists)
+    - name: Upload Jacoco Report as Artifact
       uses: actions/upload-artifact@v4
       with:
         name: forceupdatekit-coverage-report
-        path: forceupdatekit/build/reports/jacoco/**/html/** || true
+        path: forceupdatekit/build/reports/jacoco/**/html/**
