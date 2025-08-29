@@ -121,9 +121,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 tasks.register("printCoverage") {
     dependsOn("jacocoTestReport")
     doLast {
-        val reportFile = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        val reportFile = file("${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
         if (!reportFile.exists()) {
-            println("⚠️ Jacoco XML report not found!")
+            println("⚠️ Jacoco XML report not found at: ${reportFile.absolutePath}")
             return@doLast
         }
 
