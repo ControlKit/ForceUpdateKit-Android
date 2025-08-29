@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build & Test (ForceUpdateKit)
+    name: Build & Test ForceUpdateKit
     runs-on: ubuntu-latest
 
     steps:
@@ -32,17 +32,17 @@ jobs:
             ${{ runner.os }}-gradle
 
       - name: Run tests (ForceUpdateKit)
-        run: ./gradlew :forceUpdatekit:clean :forceUpdatekit:testDebugUnitTest --stacktrace
+        run: ./gradlew :forceUpdatekit:testDebugUnitTest --stacktrace
 
       - name: Generate JaCoCo report (ForceUpdateKit)
         run: ./gradlew :forceUpdatekit:jacocoTestReport
 
-      - name: Print coverage percentage
+      - name: Print coverage (ForceUpdateKit)
         run: ./gradlew :forceUpdatekit:printCoverage
 
-      - name: Upload JaCoCo HTML report
+      - name: Upload JaCoCo HTML report (ForceUpdateKit)
         uses: actions/upload-artifact@v4
         with:
-          name: forceupdatekit-jacoco-report
+          name: jacoco-report
           path: forceUpdatekit/build/reports/jacoco/jacocoTestReport/html
           if-no-files-found: error
