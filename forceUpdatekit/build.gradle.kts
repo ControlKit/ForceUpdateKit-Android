@@ -96,7 +96,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
     classDirectories.setFrom(
         fileTree("${buildDir}/intermediates/javac/debug/classes") {
-            include("com/forceupdatekit/**") // فقط پکیج ماژول
+            include("com/forceupdatekit/**")
             exclude(
                 "**/R.class",
                 "**/R\$*.class",
@@ -107,9 +107,10 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         }
     )
 
+    // ⚡ مسیر ایمن برای CI: همه فایل‌های exec
     executionData.setFrom(
         fileTree(buildDir) {
-            include("**/jacoco/testDebugUnitTest.exec")
+            include("**/*.exec")
         }
     )
 }
