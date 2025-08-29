@@ -13,11 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ✅ Use JDK 11 for compatibility with Jacoco
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: 17
           distribution: temurin
 
       - name: Grant execute permission for gradlew
@@ -27,20 +26,16 @@ jobs:
         run: ./gradlew :forceupdatekit:assembleDebug --stacktrace
 
       - name: Run Unit Tests
-        run: ./gradlew :forceupdatekit:testDebug --stacktrace
+        run: ./gradlew :forceupdatekit:testDebugUnitTest --stacktrace
 
       - name: Generate Jacoco Report
         run: ./gradlew :forceupdatekit:jacocoTestReport --rerun-tasks --stacktrace
 
-      - name: Debug Jacoco exec files
-        run: |
-          echo "==== Jacoco exec files ===="
-          find forceupdatekit/build -name "*.exec"
-          echo "==== Kotlin class files ===="
-          find forceupdatekit/build -name "*.class"
+      - name: Debug Jacoco folder
+        run: ls -R forceupdatekit/build/reports/jacoco/
 
-      - name: Upload Jacoco HTML report
+      - name: Upload Jacoco Artifact
         uses: actions/upload-artifact@v4
         with:
           name: forceupdatekit-coverage-report
-          path: forceupdatekit/build/reports/jacoco/html
+          path: forceupdatekit/build/reports/jacoco/**/html/**

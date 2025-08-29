@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.10"
-    id("jacoco")
+    jacoco
 }
 
 android {
@@ -77,17 +77,13 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
 }
-// 1️⃣ Enable Jacoco for all JVM Unit Tests safely
-tasks.withType<Test>().configureEach {
-    extensions.configure(JacocoTaskExtension::class.java) {
-        isIncludeNoLocationClasses = true
-        setDestinationFile(file("$buildDir/jacoco/${name}.exec"))
-    }
+tasks.withType<Test> {
+    useJUnit()
+    finalizedBy("jacocoTestReport") // پس از هر تست، Jacoco Report تولید شود
 }
 
-// 2️⃣ Jacoco Report Task
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn(tasks.withType<Test>()) // وابسته به تمام Test taskها
+    dependsOn(tasks.withType<Test>())
 
     reports {
         html.required.set(true)
@@ -95,22 +91,27 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.outputLocation.set(file("$buildDir/reports/jacoco/html"))
     }
 
-    classDirectories.setFrom(
-        fileTree("$buildDir/classes/kotlin/debug") {
-            exclude(
-                "**/R.class",
-                "**/R\$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*"
-            )
-        }
-    )
+    val classFiles = fileTree("$buildDir/tmp/kotlin-classes/debug") {
+        exclude(
+            "**/R.class",
+            "**/R\$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*"
+        )
+    } + fileTree("$buildDir/intermediates/javac/debug/classes") {
+        exclude(
+            "**/R.class",
+            "**/R\$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*"
+        )
+    }
 
+    classDirectories.setFrom(classFiles)
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include("jacoco/**/*.exec")
-        }
-    )
+    executionData.setFrom(fileTree(buildDir) {
+        include("jacoco/*.exec", "outputs/unit_test_code_coverage/**/*.exec")
+    })
 }
