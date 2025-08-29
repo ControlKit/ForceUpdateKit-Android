@@ -80,8 +80,7 @@ dependencies {
 jacoco {
     toolVersion = "0.8.10"
 }
-
-// ✅ تسک گزارش کاورج
+// ✅ تولید گزارش JaCoCo فقط برای این ماژول
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -91,10 +90,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         csv.required.set(false)
     }
 
-    // مسیر سورس
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
 
-    // کلاس‌های کامپایل‌شده
     classDirectories.setFrom(
         fileTree("${buildDir}/intermediates/javac/debug") {
             exclude(
@@ -107,10 +104,38 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         }
     )
 
-    // داده‌های اجرایی JaCoCo
     executionData.setFrom(
         fileTree(buildDir) {
             include("**/jacoco/testDebugUnitTest.exec")
         }
     )
+}
+
+// ✅ نمایش درصد coverage در console
+tasks.register<JacocoCoverageVerification>("verifyCoverage") {
+    dependsOn("testDebugUnitTest")
+    classDirectories.setFrom(
+        fileTree("${buildDir}/intermediates/javac/debug") {
+            exclude(
+                "**/R.class",
+                "**/R\$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*"
+            )
+        }
+    )
+    executionData.setFrom(
+        fileTree(buildDir) {
+            include("**/jacoco/testDebugUnitTest.exec")
+        }
+    )
+
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.0".toBigDecimal() // حداقل 0٪، فقط برای نمایش درصد
+            }
+        }
+    }
 }

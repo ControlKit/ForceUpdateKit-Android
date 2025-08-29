@@ -12,18 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ۱. گرفتن کد
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ۲. نصب JDK
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # ۳. کش برای gradle
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -34,15 +31,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      # ۴. اجرای تست‌ها
       - name: Run tests
         run: ./gradlew clean testDebugUnitTest --stacktrace
 
-      # ۵. تولید گزارش coverage
       - name: Generate JaCoCo report
         run: ./gradlew jacocoTestReport
 
-      # ۶. آپلود گزارش به عنوان artifact
+      - name: Verify coverage
+        run: ./gradlew verifyCoverage
+
       - name: Upload JaCoCo report
         uses: actions/upload-artifact@v4
         with:
