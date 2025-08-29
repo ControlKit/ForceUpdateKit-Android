@@ -83,7 +83,6 @@ jacoco {
     toolVersion = "0.8.10"
 }
 // ✅ تولید گزارش JaCoCo فقط برای این ماژول
-// ✅ گزارش JaCoCo فقط برای ماژول forceupdate
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -115,7 +114,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     )
 }
 
-// ✅ نمایش درصد دقیق در console
+// ✅ نمایش درصد دقیق در console بدون ارور DTD
 tasks.register("printCoverage") {
     dependsOn("jacocoTestReport")
     doLast {
@@ -125,9 +124,11 @@ tasks.register("printCoverage") {
             return@doLast
         }
 
-        val xml = DocumentBuilderFactory.newInstance()
-            .newDocumentBuilder()
-            .parse(xmlFile)
+        val factory = DocumentBuilderFactory.newInstance()
+        factory.isValidating = false
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+
+        val xml = factory.newDocumentBuilder().parse(xmlFile)
 
         val counters = xml.getElementsByTagName("counter")
         var covered = 0
