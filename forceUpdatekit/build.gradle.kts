@@ -77,24 +77,30 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
 }
+tasks.withType<Test>().configureEach {
+    extensions.configure(JacocoTaskExtension::class.java) {
+        isIncludeNoLocationClasses = true
+        setDestinationFile(file("${buildDir}/jacoco/${name}.exec"))
+    }
+}
 
+// 2️⃣ Jacoco report task
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest") // حتماً ابتدا تست‌ها اجرا شوند
+    dependsOn("testDebugUnitTest")
 
     reports {
         html.required.set(true)
         xml.required.set(true)
-        html.outputLocation.set(file("$buildDir/reports/jacoco/jacocoTestReport/html"))
+        html.outputLocation.set(file("$buildDir/reports/jacoco/html"))
     }
 
     classDirectories.setFrom(
-        fileTree("$buildDir/tmp/kotlin-classes/debug") {
+        fileTree("$buildDir/classes/kotlin/debug") {
             exclude(
                 "**/R.class",
                 "**/R\$*.class",
                 "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/*Test*.*"
+                "**/Manifest*.*"
             )
         }
     )
@@ -103,10 +109,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
     executionData.setFrom(
         fileTree(buildDir) {
-            include(
-                "jacoco/testDebugUnitTest.exec", // مسیر اصلی AGP 8+
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec" // مسیر fallback
-            )
+            include("jacoco/**/*.exec")
         }
     )
 }
