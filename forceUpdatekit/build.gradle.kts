@@ -77,16 +77,17 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 
 }
+// 1️⃣ Enable Jacoco for all JVM Unit Tests safely
 tasks.withType<Test>().configureEach {
     extensions.configure(JacocoTaskExtension::class.java) {
         isIncludeNoLocationClasses = true
-        setDestinationFile(file("${buildDir}/jacoco/${name}.exec"))
+        setDestinationFile(file("$buildDir/jacoco/${name}.exec"))
     }
 }
 
-// 2️⃣ Jacoco report task
+// 2️⃣ Jacoco Report Task
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest")
+    dependsOn(tasks.withType<Test>()) // وابسته به تمام Test taskها
 
     reports {
         html.required.set(true)

@@ -26,17 +26,19 @@ jobs:
         run: ./gradlew :forceupdatekit:assembleDebug --stacktrace
 
       - name: Run Unit Tests
-        run: ./gradlew :forceupdatekit:testDebugUnitTest --stacktrace
+        run: ./gradlew :forceupdatekit:testDebug --stacktrace
 
       - name: Generate Jacoco Report
         run: ./gradlew :forceupdatekit:jacocoTestReport --rerun-tasks --stacktrace
 
       - name: Debug Jacoco exec files
         run: |
+          echo "==== Jacoco exec files ===="
           find forceupdatekit/build -name "*.exec"
+          echo "==== Kotlin class files ===="
           find forceupdatekit/build -name "*.class"
 
-      - name: Upload Jacoco Artifact
+      - name: Upload Jacoco HTML report
         uses: actions/upload-artifact@v4
         with:
           name: forceupdatekit-coverage-report
