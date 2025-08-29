@@ -82,46 +82,43 @@ dependencies {
 jacoco {
     toolVersion = "0.8.10"
 }
-// ✅ تولید گزارش JaCoCo فقط برای این ماژول
+tasks.withType<Test> {
+    useJUnitPlatform() // مطمئن بشیم JUnit 5 ساپورت میشه
+}
+
+// ✅ کانفیگ JaCoCo
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest")
+    dependsOn("test") // همه تست‌ها ران بشن (نه فقط debug)
 
     reports {
         xml.required.set(true)
         html.required.set(true)
-        csv.required.set(false)
+    }
+
+    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        exclude(
+            "**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*",
+            "**/*Test*.*"
+        )
     }
 
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    classDirectories.setFrom(debugTree)
 
-    classDirectories.setFrom(
-        fileTree("${buildDir}/intermediates/javac/debug/classes") {
-            include("com/forceupdatekit/**")
-            exclude(
-                "**/R.class",
-                "**/R\$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/*Test*.*"
-            )
-        }
-    )
-
-    // ⚡ مسیر ایمن برای CI: همه فایل‌های exec
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include("**/*.exec")
-        }
-    )
+    // همه فایل‌های exec (safe برای CI)
+    executionData.setFrom(fileTree(buildDir) { include("**/*.exec") })
 }
 
-// ✅ نمایش درصد دقیق در console بدون ارور DTD
+// ✅ پرینت درصد کاورج
 tasks.register("printCoverage") {
     dependsOn("jacocoTestReport")
     doLast {
         val xmlFile = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
         if (!xmlFile.exists()) {
-            println("Coverage XML not found!")
+            println("⚠️ Coverage XML not found: $xmlFile")
             return@doLast
         }
 
@@ -130,7 +127,6 @@ tasks.register("printCoverage") {
         factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
 
         val xml = factory.newDocumentBuilder().parse(xmlFile)
-
         val counters = xml.getElementsByTagName("counter")
         var covered = 0
         var missed = 0

@@ -31,17 +31,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      # ✅ اجرای درست تست ها برای ماژول forceUpdatekit
-      - name: Run unit tests
-        run: ./gradlew clean :forceUpdatekit:testDebugUnitTest --stacktrace
+      # ✅ اجرای همه تست‌ها
+      - name: Run all unit tests
+        run: ./gradlew clean :forceUpdatekit:test --stacktrace
 
-      # ✅ تولید گزارش کاورج برای همون ماژول
+      # ✅ ساخت گزارش JaCoCo
       - name: Generate JaCoCo report
         run: ./gradlew :forceUpdatekit:jacocoTestReport
 
-      # ✅ پرینت درصد کاورج از تسک سفارشی
+      # ✅ پرینت درصد کاورج
       - name: Print coverage percentage
         run: ./gradlew :forceUpdatekit:printCoverage
+
+      # ✅ برای دیباگ: ببینیم چه فایل‌هایی ساخته شدن
+      - name: List coverage reports
+        run: ls -R forceUpdatekit/build/reports/jacoco || true
 
       # ✅ آپلود گزارش HTML
       - name: Upload JaCoCo HTML report
