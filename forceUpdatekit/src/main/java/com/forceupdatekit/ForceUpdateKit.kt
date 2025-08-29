@@ -29,7 +29,7 @@ class ForceUpdateKit(
         val forceUpdateViewModel: ForceUpdateViewModel = viewModel(
             factory = ForceUpdateViewModelFactory(api)
         )
-            forceUpdateViewModel.setConfig(config)
+        forceUpdateViewModel.setConfig(config)
         val state = forceUpdateViewModel.state.collectAsState().value
 
         LaunchedEffect(Unit) {
@@ -51,12 +51,11 @@ class ForceUpdateKit(
                     ForceUpdateViewStyle.checkViewStyle(config.viewConfig.forceUpdateViewStyle)
                         .ShowView(config = config.viewConfig, it, forceUpdateViewModel)
                 }
-
             }
 
             is ForceUpdateState.Error -> RetryView(config.viewConfig, tryAgain = {
-                    forceUpdateViewModel.tryAgain()
-                })
+                forceUpdateViewModel.tryAgain()
+            })
 
 
         }

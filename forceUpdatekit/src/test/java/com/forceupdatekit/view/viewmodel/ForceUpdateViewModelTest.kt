@@ -85,7 +85,7 @@ class ForceUpdateViewModelTest {
                 created_at = null
             )
         )
-        coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Success(resp)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(resp)
 
         viewModel.setConfig(config)
         advanceUntilIdle()
@@ -96,10 +96,10 @@ class ForceUpdateViewModelTest {
         // call again: چون state دیگه Initial نیست نباید دوباره API صدا بخوره
         viewModel.setConfig(config)
         advanceUntilIdle()
-        coVerify(exactly = 1) { api.getForceUpdateData(any(), any(), any(), any()) }
+        coVerify(exactly = 1) { api.getForceUpdateData(any(), any(), any(), any(),any()) }
     }
     @Test fun `success with null body  NoUpdate`() = runTest(dispatcher) {
-        coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Success(null)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(null)
         viewModel.setConfig(config)
         advanceUntilIdle()
         assertEquals(ForceUpdateState.NoUpdate, viewModel.state.value)
@@ -107,7 +107,7 @@ class ForceUpdateViewModelTest {
 
     @Test
     fun `setConfig should call getData`() = runTest(dispatcher) {
-        coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Success(null)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(null)
 
         viewModel.setConfig(config)
         advanceUntilIdle()
@@ -135,7 +135,7 @@ class ForceUpdateViewModelTest {
             )
         )
 
-        coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Success(fakeApiResponse)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(fakeApiResponse)
 
 
         viewModel.setConfig(config)
@@ -147,7 +147,7 @@ class ForceUpdateViewModelTest {
 
     @Test
     fun `getData success with no update`() = runTest(dispatcher) {
-        coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Success(null)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(null)
 
         viewModel.setConfig(config)
         advanceUntilIdle()
@@ -158,7 +158,7 @@ class ForceUpdateViewModelTest {
     @Test
     fun `getData error`() = runTest(dispatcher) {
         val apiError = ApiError("Something went wrong", 0, ApiError.ErrorStatus.UNKNOWN_ERROR)
-        coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Error(apiError)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Error(apiError)
 
         viewModel.setConfig(config)
         advanceUntilIdle()
@@ -169,7 +169,7 @@ class ForceUpdateViewModelTest {
 
     @Test
     fun `tryAgain should reset state and call getData`() = runTest(dispatcher) {
-        coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Success(null)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(null)
 
         viewModel.setConfig(config)
         advanceUntilIdle()
@@ -225,7 +225,7 @@ fun `api returns valid update should set state to Update`() = runTest(dispatcher
         )
     )
 
-    coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Success(apiResponse)
+    coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(apiResponse)
 
     viewModel.setConfig(config)
     advanceUntilIdle()
@@ -258,7 +258,7 @@ fun `api returns valid update should set state to Update`() = runTest(dispatcher
             )
         )
 
-        coEvery { api.getForceUpdateData(any(), any(), any(), any()) } returns NetworkResult.Success(apiResponse)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(apiResponse)
 
         viewModel.setConfig(config)
         advanceUntilIdle()

@@ -38,7 +38,6 @@ class ForceUpdateViewModel(
     fun getData() {
         if (state.value != ForceUpdateState.Initial || config == null) return
         viewModelScope.launch {
-
             val data = api.getForceUpdateData(
                 config!!.route,
                 config!!.appId,
@@ -46,23 +45,15 @@ class ForceUpdateViewModel(
                 config!!.deviceId,
                 config!!.sdkVersion
             )
-
-
             when (data) {
                 is NetworkResult.Success -> {
-
                     if (data.value != null) {
-
                         _mutableState.value = ForceUpdateState.Update(data.value.toDomain())
-
                     } else {
                         _mutableState.value = ForceUpdateState.NoUpdate
-
                     }
                 }
-
                 is NetworkResult.Error -> {
-
                     _mutableState.value = ForceUpdateState.Error(data.error)
                 }
             }
