@@ -82,9 +82,9 @@ dependencies {
 jacoco {
     toolVersion = "0.8.10"
 }
-tasks.withType<Test> {
-    useJUnitPlatform() // مطمئن بشیم JUnit 5 ساپورت میشه
-}
+//tasks.withType<Test> {
+//    useJUnitPlatform() // مطمئن بشیم JUnit 5 ساپورت میشه
+//}
 
 // ✅ کانفیگ JaCoCo
 tasks.register<JacocoReport>("jacocoTestReport") {
