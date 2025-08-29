@@ -48,4 +48,3 @@ jobs:
         with:
           name: jacoco-report
           path: com.forceupdatekit/build/reports/jacoco/jacocoTestReport/html
-
