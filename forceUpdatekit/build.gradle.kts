@@ -82,11 +82,11 @@ dependencies {
 jacoco {
     toolVersion = "0.8.10"
 }
-
 tasks.withType<Test> {
     useJUnit()
     finalizedBy("jacocoTestReport")
 }
+
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -95,31 +95,17 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    // سورس‌های Java + Kotlin
     val mainSrc = files(
         "${project.projectDir}/src/main/java",
         "${project.projectDir}/src/main/kotlin"
     )
 
-    // کلاس‌های خروجی Kotlin + Java (برای AGP 8+ هر دو مسیر رو پوشش می‌دیم)
     val debugTree = files(
         fileTree("${buildDir}/tmp/kotlin-classes/debug") {
-            exclude(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/*Test*.*"
-            )
+            exclude("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
         },
         fileTree("${buildDir}/intermediates/javac/debug/classes") {
-            exclude(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/*Test*.*"
-            )
+            exclude("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
         }
     )
 
@@ -128,4 +114,37 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     executionData.setFrom(fileTree(buildDir) {
         include("**/*.exec", "**/*.ec")
     })
+}
+
+
+
+tasks.register("printCoverage") {
+    dependsOn("jacocoTestReport")
+    doLast {
+        val reportFile = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        if (!reportFile.exists()) {
+            println("⚠️ Jacoco XML report not found!")
+            return@doLast
+        }
+
+        val parser = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        val doc = parser.parse(reportFile)
+        val counters = doc.getElementsByTagName("counter")
+
+        var covered = 0
+        var missed = 0
+        for (i in 0 until counters.length) {
+            val node = counters.item(i)
+            val type = node.attributes.getNamedItem("type").nodeValue
+            if (type == "INSTRUCTION") {
+                covered = node.attributes.getNamedItem("covered").nodeValue.toInt()
+                missed = node.attributes.getNamedItem("missed").nodeValue.toInt()
+                break
+            }
+        }
+
+        val total = covered + missed
+        val percent = if (total > 0) covered * 100.0 / total else 0.0
+        println("📊 ForceUpdateKit coverage: ${"%.2f".format(percent)}%")
+    }
 }

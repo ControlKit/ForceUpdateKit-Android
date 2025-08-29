@@ -37,6 +37,9 @@ jobs:
       - name: Generate JaCoCo report (ForceUpdateKit)
         run: ./gradlew :forceUpdatekit:jacocoTestReport
 
+      - name: Print coverage percentage
+        run: ./gradlew :forceUpdatekit:printCoverage
+
       - name: Upload JaCoCo HTML report
         uses: actions/upload-artifact@v4
         with:
