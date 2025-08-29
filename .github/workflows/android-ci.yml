@@ -37,13 +37,14 @@ jobs:
       run: ./gradlew :forceupdatekit:testDebugUnitTest --stacktrace
 
     - name: Generate Jacoco Coverage Report
-      run: ./gradlew :forceupdatekit:jacocoTestReport --stacktrace --rerun-tasks
+      run: ./gradlew :forceupdatekit:jacocoTestReport --rerun-tasks --stacktrace
 
-    - name: Debug Jacoco folder
-      run: ls -R forceupdatekit/build/reports/jacoco/jacocoTestReport/html
+    - name: Debug Jacoco folder (optional)
+      run: ls -R forceupdatekit/build/reports/jacoco/
 
     - name: Upload Jacoco Report as Artifact
       uses: actions/upload-artifact@v4
       with:
         name: forceupdatekit-coverage-report
-        path: forceupdatekit/build/reports/jacoco/jacocoTestReport/html/**
+       
+        path: forceupdatekit/build/reports/jacoco/**/html/**
