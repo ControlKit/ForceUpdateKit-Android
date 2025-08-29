@@ -14,18 +14,18 @@ jobs:
     steps:
       # ۱. گرفتن کد
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # ۲. نصب JDK
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
       # ۳. کش برای gradle
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -44,7 +44,7 @@ jobs:
 
       # ۶. آپلود گزارش به عنوان artifact
       - name: Upload JaCoCo report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
           path: com.forceupdatekit/build/reports/jacoco/jacocoTestReport/html
