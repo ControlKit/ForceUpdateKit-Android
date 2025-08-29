@@ -1,4 +1,4 @@
-name: Android CI
+name: ForceUpdateKit CI
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build & Test
+    name: Build & Test ForceUpdateKit
     runs-on: ubuntu-latest
 
     steps:
@@ -31,23 +31,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      # ✅ اجرای همه تست‌ها
-      - name: Run all unit tests
-        run: ./gradlew clean :forceUpdatekit:test --stacktrace
+      # فقط تست‌های ماژول forceUpdatekit
+      - name: Run ForceUpdateKit unit tests
+        run: ./gradlew :forceUpdatekit:testDebugUnitTest --stacktrace
 
-      # ✅ ساخت گزارش JaCoCo
+      # تولید گزارش کاورج فقط برای forceUpdatekit
       - name: Generate JaCoCo report
         run: ./gradlew :forceUpdatekit:jacocoTestReport
 
-      # ✅ پرینت درصد کاورج
-      - name: Print coverage percentage
-        run: ./gradlew :forceUpdatekit:printCoverage
+      # گزارش تست‌ها (برای debug در صورت fail شدن)
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: forceUpdatekit/build/reports/tests/testDebugUnitTest
 
-      # ✅ برای دیباگ: ببینیم چه فایل‌هایی ساخته شدن
-      - name: List coverage reports
-        run: ls -R forceUpdatekit/build/reports/jacoco || true
-
-      # ✅ آپلود گزارش HTML
+      # گزارش HTML کاورج
       - name: Upload JaCoCo HTML report
         uses: actions/upload-artifact@v4
         with:

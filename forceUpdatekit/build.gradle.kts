@@ -82,20 +82,25 @@ dependencies {
 jacoco {
     toolVersion = "0.8.10"
 }
-//tasks.withType<Test> {
-//    useJUnitPlatform() // مطمئن بشیم JUnit 5 ساپورت میشه
-//}
+// اطمینان از اجرای jacoco بعد تست‌ها
+tasks.withType<Test> {
+    useJUnit() // چون گفتی تست‌هات JUnit4 هستن
+    finalizedBy("jacocoTestReport")
+}
 
-// ✅ کانفیگ JaCoCo
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("test") // همه تست‌ها ران بشن (نه فقط debug)
+    dependsOn("testDebugUnitTest")
 
     reports {
         xml.required.set(true)
         html.required.set(true)
     }
 
-    val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+    // مسیر سورس کد
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    // کلاس‌ها (به‌جز فایل‌های اتوماتیک Android)
+    val debugTree = fileTree("${buildDir}/intermediates/javac/debug") {
         exclude(
             "**/R.class",
             "**/R$*.class",
@@ -105,41 +110,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         )
     }
 
-    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
-    classDirectories.setFrom(debugTree)
-
-    // همه فایل‌های exec (safe برای CI)
-    executionData.setFrom(fileTree(buildDir) { include("**/*.exec") })
-}
-
-// ✅ پرینت درصد کاورج
-tasks.register("printCoverage") {
-    dependsOn("jacocoTestReport")
-    doLast {
-        val xmlFile = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-        if (!xmlFile.exists()) {
-            println("⚠️ Coverage XML not found: $xmlFile")
-            return@doLast
-        }
-
-        val factory = DocumentBuilderFactory.newInstance()
-        factory.isValidating = false
-        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-
-        val xml = factory.newDocumentBuilder().parse(xmlFile)
-        val counters = xml.getElementsByTagName("counter")
-        var covered = 0
-        var missed = 0
-        for (i in 0 until counters.length) {
-            val c = counters.item(i)
-            val type = c.attributes.getNamedItem("type").nodeValue
-            if (type == "LINE") {
-                covered += c.attributes.getNamedItem("covered").nodeValue.toInt()
-                missed += c.attributes.getNamedItem("missed").nodeValue.toInt()
-            }
-        }
-        val total = covered + missed
-        val percent = if (total > 0) (covered * 100.0 / total) else 0.0
-        println("📊 ForceUpdate coverage: %.2f%%".format(percent))
-    }
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(buildDir) {
+        include("**/*.exec", "**/*.ec")
+    })
 }
