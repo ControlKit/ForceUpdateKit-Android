@@ -151,7 +151,7 @@ fun Example() {
 
     forceUpdateKit = ForceUpdateKit(
         ForceUpdateServiceConfig(
-            version = "1",
+            version = "0",
             appId = text.value,
             deviceId = "dsd",
             route = "https://tauri.ir/api/force-updates",

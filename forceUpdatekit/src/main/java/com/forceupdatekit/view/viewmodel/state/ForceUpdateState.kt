@@ -8,6 +8,7 @@ sealed class ForceUpdateState {
     object NoUpdate : ForceUpdateState()
     data class Update(val data: CheckUpdateResponse?) : ForceUpdateState()
     data class Error(val data: ApiError?) : ForceUpdateState()
+    object SkipError : ForceUpdateState()
 
 
 }

@@ -57,7 +57,7 @@ class ForceUpdateKit(
                 forceUpdateViewModel.tryAgain()
             })
 
-
+            ForceUpdateState.SkipError -> Unit
         }
 
     }

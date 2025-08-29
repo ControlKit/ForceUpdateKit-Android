@@ -53,8 +53,14 @@ class ForceUpdateViewModel(
                         _mutableState.value = ForceUpdateState.NoUpdate
                     }
                 }
+
                 is NetworkResult.Error -> {
-                    _mutableState.value = ForceUpdateState.Error(data.error)
+                    if (config!!.skipException) {
+                        _mutableState.value = ForceUpdateState.SkipError
+                    } else {
+                        _mutableState.value = ForceUpdateState.Error(data.error)
+
+                    }
                 }
             }
         }

@@ -13,6 +13,7 @@ data class ForceUpdateServiceConfig(
     var version: String = "0.0.0",
     var appId: String = "Android",
     var deviceId: String="1",
-    var sdkVersion: String="1"
+    var sdkVersion: String="1",
+    var skipException: Boolean = true,
 
     )

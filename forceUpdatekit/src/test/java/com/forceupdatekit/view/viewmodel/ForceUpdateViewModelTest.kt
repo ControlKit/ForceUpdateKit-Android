@@ -8,7 +8,6 @@ import com.forceupdatekit.view.viewmodel.state.ForceUpdateState
 import com.forceupdatekit.service.apiError.ApiError
 import com.forceupdatekit.service.model.ApiCheckUpdateResponse
 import com.forceupdatekit.service.model.ApiData
-import com.forceupdatekit.service.model.CheckUpdateResponse
 import com.forceupdatekit.service.model.LocalizedText
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -21,9 +20,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
@@ -34,7 +31,7 @@ class ForceUpdateViewModelTest {
     private lateinit var viewModel: ForceUpdateViewModel
     private val api: ForceUpdateApi = mockk()
 
-    private val config = ForceUpdateServiceConfig(
+    private val baseConfig = ForceUpdateServiceConfig(
         route = "test/route",
         appId = "app-id",
         version = "1.0.0",
@@ -53,11 +50,9 @@ class ForceUpdateViewModelTest {
     }
 
     @Test fun `dismissDialog closes and emits forceUpdateEvent`() = runTest(dispatcher) {
-        // اول show
         viewModel.showDialog()
         assertTrue(viewModel.openDialog.value)
 
-        // تست event با Turbine
         viewModel.forceUpdateEvent.test {
             viewModel.dismissDialog()
             assertFalse(viewModel.openDialog.value)
@@ -87,20 +82,21 @@ class ForceUpdateViewModelTest {
         )
         coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(resp)
 
-        viewModel.setConfig(config)
+        viewModel.setConfig(baseConfig)
         advanceUntilIdle()
 
         val s1 = viewModel.state.value
         assert(s1 is ForceUpdateState.Update)
 
         // call again: چون state دیگه Initial نیست نباید دوباره API صدا بخوره
-        viewModel.setConfig(config)
+        viewModel.setConfig(baseConfig)
         advanceUntilIdle()
         coVerify(exactly = 1) { api.getForceUpdateData(any(), any(), any(), any(),any()) }
     }
+
     @Test fun `success with null body  NoUpdate`() = runTest(dispatcher) {
         coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(null)
-        viewModel.setConfig(config)
+        viewModel.setConfig(baseConfig)
         advanceUntilIdle()
         assertEquals(ForceUpdateState.NoUpdate, viewModel.state.value)
     }
@@ -109,7 +105,7 @@ class ForceUpdateViewModelTest {
     fun `setConfig should call getData`() = runTest(dispatcher) {
         coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(null)
 
-        viewModel.setConfig(config)
+        viewModel.setConfig(baseConfig)
         advanceUntilIdle()
 
         assertEquals(ForceUpdateState.NoUpdate, viewModel.state.value)
@@ -137,8 +133,7 @@ class ForceUpdateViewModelTest {
 
         coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(fakeApiResponse)
 
-
-        viewModel.setConfig(config)
+        viewModel.setConfig(baseConfig)
         advanceUntilIdle()
 
         val state = viewModel.state.value
@@ -149,29 +144,77 @@ class ForceUpdateViewModelTest {
     fun `getData success with no update`() = runTest(dispatcher) {
         coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(null)
 
-        viewModel.setConfig(config)
+        viewModel.setConfig(baseConfig)
         advanceUntilIdle()
 
         assertEquals(ForceUpdateState.NoUpdate, viewModel.state.value)
     }
 
     @Test
-    fun `getData error`() = runTest(dispatcher) {
-        val apiError = ApiError("Something went wrong", 0, ApiError.ErrorStatus.UNKNOWN_ERROR)
+    fun `getData error with skipException false returns Error`() = runTest(dispatcher) {        val apiError = ApiError("Something went wrong", 0, ApiError.ErrorStatus.UNKNOWN_ERROR)
         coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Error(apiError)
 
-        viewModel.setConfig(config)
+        val cfg = baseConfig.copy(skipException = false)
+        viewModel.setConfig(cfg)
         advanceUntilIdle()
 
         val state = viewModel.state.value
-        assert(state is ForceUpdateState.Error)
+        assertTrue(state is ForceUpdateState.Error)
+    }
+
+    @Test
+    fun `getData error with skipException true returns SkipError`() = runTest(dispatcher) {
+        val apiError = ApiError("Network down", 0, ApiError.ErrorStatus.NO_CONNECTION)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Error(apiError)
+
+        val cfg = baseConfig.copy(skipException = true)
+        viewModel.setConfig(cfg)
+        advanceUntilIdle()
+
+        assertEquals(ForceUpdateState.SkipError, viewModel.state.value)
+    }
+
+    @Test
+    fun `SkipError then tryAgain should fetch again and update state`() = runTest(dispatcher) {
+        val apiError = ApiError("Temporary", 0, ApiError.ErrorStatus.UNKNOWN_ERROR)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(), any()) } returnsMany listOf(
+            NetworkResult.Error(apiError),      // بار اول: خطا → SkipError
+            NetworkResult.Success(null)         // بار دوم: موفق ولی بدنه null → NoUpdate
+        )
+
+        val cfg = baseConfig.copy(skipException = true)
+        viewModel.setConfig(cfg)
+        advanceUntilIdle()
+        assertEquals(ForceUpdateState.SkipError, viewModel.state.value)
+
+        viewModel.tryAgain()
+        advanceUntilIdle()
+        assertEquals(ForceUpdateState.NoUpdate, viewModel.state.value)
+
+        coVerify(exactly = 2) { api.getForceUpdateData(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `setConfig called twice after SkipError should call api once`() = runTest(dispatcher) {
+        val apiError = ApiError("Oops", 0, ApiError.ErrorStatus.UNKNOWN_ERROR)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(), any()) } returns NetworkResult.Error(apiError)
+
+        val cfg = baseConfig.copy(skipException = true)
+        viewModel.setConfig(cfg)
+        advanceUntilIdle()
+        assertEquals(ForceUpdateState.SkipError, viewModel.state.value)
+
+        viewModel.setConfig(cfg)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { api.getForceUpdateData(any(), any(), any(), any(), any()) }
     }
 
     @Test
     fun `tryAgain should reset state and call getData`() = runTest(dispatcher) {
         coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(null)
 
-        viewModel.setConfig(config)
+        viewModel.setConfig(baseConfig)
         advanceUntilIdle()
 
         viewModel.tryAgain()
@@ -204,39 +247,39 @@ class ForceUpdateViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-//    Integration
-@Test
-fun `api returns valid update should set state to Update`() = runTest(dispatcher) {
-    val apiResponse = ApiCheckUpdateResponse(
-        data = ApiData(
-            id = "1",
-            title = listOf(LocalizedText("en", "New Version")),
-            description = listOf(LocalizedText("en", "Update available")),
-            force = true,
-            icon = null,
-            link = null,
-            button_title = listOf(LocalizedText("en", "Update Now")),
-            cancel_button_title = listOf(LocalizedText("en", "Later")),
-            version = listOf(LocalizedText("en", "2.0.0")),
-            sdk_version = 33,
-            minimum_version = "1.0.0",
-            maximum_version = "3.0.0",
-            created_at = "2025-08-28"
+
+    // Integration
+    @Test
+    fun `api returns valid update should set state to Update`() = runTest(dispatcher) {
+        val apiResponse = ApiCheckUpdateResponse(
+            data = ApiData(
+                id = "1",
+                title = listOf(LocalizedText("en", "New Version")),
+                description = listOf(LocalizedText("en", "Update available")),
+                force = true,
+                icon = null,
+                link = null,
+                button_title = listOf(LocalizedText("en", "Update Now")),
+                cancel_button_title = listOf(LocalizedText("en", "Later")),
+                version = listOf(LocalizedText("en", "2.0.0")),
+                sdk_version = 33,
+                minimum_version = "1.0.0",
+                maximum_version = "3.0.0",
+                created_at = "2025-08-28"
+            )
         )
-    )
 
-    coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(apiResponse)
+        coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(apiResponse)
 
-    viewModel.setConfig(config)
-    advanceUntilIdle()
+        viewModel.setConfig(baseConfig)
+        advanceUntilIdle()
 
-    val state = viewModel.state.value
-    assertTrue(state is ForceUpdateState.Update)
+        val state = viewModel.state.value
+        assertTrue(state is ForceUpdateState.Update)
 
-    val updateState = state as ForceUpdateState.Update
-    assertEquals("New Version", updateState.data?.title) // اینجا data همون CheckUpdateResponse شده
-}
-
+        val updateState = state as ForceUpdateState.Update
+        assertEquals("New Version", updateState.data?.title)
+    }
 
     @Test
     fun `api returns empty data should set state to Update with null fields`() = runTest(dispatcher) {
@@ -260,7 +303,7 @@ fun `api returns valid update should set state to Update`() = runTest(dispatcher
 
         coEvery { api.getForceUpdateData(any(), any(), any(), any(),any()) } returns NetworkResult.Success(apiResponse)
 
-        viewModel.setConfig(config)
+        viewModel.setConfig(baseConfig)
         advanceUntilIdle()
 
         val state = viewModel.state.value
@@ -271,6 +314,4 @@ fun `api returns valid update should set state to Update`() = runTest(dispatcher
         assertEquals(null, updateState.data?.title)
         assertEquals(null, updateState.data?.forceUpdate)
     }
-
-
 }
