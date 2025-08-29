@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.10"
-//    id("jacoco")
+    id("jacoco")
 }
 
 android {
@@ -79,7 +79,7 @@ dependencies {
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest")
+    dependsOn("testDebugUnitTest") // حتماً ابتدا تست‌ها اجرا شوند
 
     reports {
         html.required.set(true)
@@ -87,24 +87,26 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.outputLocation.set(file("$buildDir/reports/jacoco/jacocoTestReport/html"))
     }
 
-    val fileFilter = listOf(
-        "**/R.class",
-        "**/R\$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*"
+    classDirectories.setFrom(
+        fileTree("$buildDir/tmp/kotlin-classes/debug") {
+            exclude(
+                "**/R.class",
+                "**/R\$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*"
+            )
+        }
     )
-
-    classDirectories.setFrom(fileTree("$buildDir/tmp/kotlin-classes/debug") {
-        exclude(fileFilter)
-    })
 
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
 
-    executionData.setFrom(fileTree(buildDir) {
-        include(
-            "jacoco/testDebugUnitTest.exec",
-            "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
-        )
-    })
+    executionData.setFrom(
+        fileTree(buildDir) {
+            include(
+                "jacoco/testDebugUnitTest.exec", // مسیر اصلی AGP 8+
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec" // مسیر fallback
+            )
+        }
+    )
 }
