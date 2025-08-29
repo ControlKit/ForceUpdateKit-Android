@@ -127,7 +127,11 @@ tasks.register("printCoverage") {
             return@doLast
         }
 
-        val parser = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+        factory.isValidating = false
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+
+        val parser = factory.newDocumentBuilder()
         val doc = parser.parse(reportFile)
         val counters = doc.getElementsByTagName("counter")
 
