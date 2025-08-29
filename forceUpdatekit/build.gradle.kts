@@ -1,3 +1,5 @@
+import javax.xml.parsers.DocumentBuilderFactory
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -81,6 +83,7 @@ jacoco {
     toolVersion = "0.8.10"
 }
 // ✅ تولید گزارش JaCoCo فقط برای این ماژول
+// ✅ گزارش JaCoCo فقط برای ماژول forceupdate
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -93,7 +96,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
 
     classDirectories.setFrom(
-        fileTree("${buildDir}/intermediates/javac/debug") {
+        fileTree("${buildDir}/intermediates/javac/debug/classes") {
+            include("com/forceupdatekit/**") // فقط پکیج ماژول
             exclude(
                 "**/R.class",
                 "**/R\$*.class",
@@ -111,31 +115,33 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     )
 }
 
-// ✅ نمایش درصد coverage در console
-tasks.register<JacocoCoverageVerification>("verifyCoverage") {
-    dependsOn("testDebugUnitTest")
-    classDirectories.setFrom(
-        fileTree("${buildDir}/intermediates/javac/debug") {
-            exclude(
-                "**/R.class",
-                "**/R\$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/*Test*.*"
-            )
+// ✅ نمایش درصد دقیق در console
+tasks.register("printCoverage") {
+    dependsOn("jacocoTestReport")
+    doLast {
+        val xmlFile = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        if (!xmlFile.exists()) {
+            println("Coverage XML not found!")
+            return@doLast
         }
-    )
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include("**/jacoco/testDebugUnitTest.exec")
-        }
-    )
 
-    violationRules {
-        rule {
-            limit {
-                minimum = "0.0".toBigDecimal() // حداقل 0٪، فقط برای نمایش درصد
+        val xml = DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(xmlFile)
+
+        val counters = xml.getElementsByTagName("counter")
+        var covered = 0
+        var missed = 0
+        for (i in 0 until counters.length) {
+            val c = counters.item(i)
+            val type = c.attributes.getNamedItem("type").nodeValue
+            if (type == "LINE") {
+                covered += c.attributes.getNamedItem("covered").nodeValue.toInt()
+                missed += c.attributes.getNamedItem("missed").nodeValue.toInt()
             }
         }
+        val total = covered + missed
+        val percent = if (total > 0) (covered * 100.0 / total) else 0.0
+        println("📊 ForceUpdate coverage: %.2f%%".format(percent))
     }
 }
