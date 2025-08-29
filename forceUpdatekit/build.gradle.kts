@@ -80,12 +80,14 @@ dependencies {
 
 
 
+// Task Jacoco برای تولید گزارش دقیق در مسیر دلخواه
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn(tasks.named("testDebugUnitTest"))
 
     reports {
         xml.required.set(true)
         html.required.set(true)
+        html.outputLocation.set(file("${buildDir}/reports/jacoco/jacocoTestReport/html"))
     }
 
     val fileFilter = listOf(
@@ -106,4 +108,3 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         include("**/jacoco/testDebugUnitTest.exec")
     })
 }
-
