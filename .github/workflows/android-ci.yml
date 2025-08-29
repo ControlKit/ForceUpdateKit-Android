@@ -1,4 +1,4 @@
-name: ForceUpdateKit CI
+name: Android CI
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build & Test ForceUpdateKit
+    name: Build & Test (ForceUpdateKit)
     runs-on: ubuntu-latest
 
     steps:
@@ -31,26 +31,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      # فقط تست‌های ماژول forceUpdatekit
-      - name: Run ForceUpdateKit unit tests
-        run: ./gradlew :forceUpdatekit:testDebugUnitTest --stacktrace
+      - name: Run tests (ForceUpdateKit)
+        run: ./gradlew :forceUpdatekit:clean :forceUpdatekit:testDebugUnitTest --stacktrace
 
-      # تولید گزارش کاورج فقط برای forceUpdatekit
-      - name: Generate JaCoCo report
+      - name: Generate JaCoCo report (ForceUpdateKit)
         run: ./gradlew :forceUpdatekit:jacocoTestReport
 
-      # گزارش تست‌ها (برای بررسی fail ها)
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report
-          path: forceUpdatekit/build/reports/tests/testDebugUnitTest
-
-      # گزارش HTML کاورج
       - name: Upload JaCoCo HTML report
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report
+          name: forceupdatekit-jacoco-report
           path: forceUpdatekit/build/reports/jacoco/jacocoTestReport/html
           if-no-files-found: error

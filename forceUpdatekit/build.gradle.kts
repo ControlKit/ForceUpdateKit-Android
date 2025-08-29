@@ -87,7 +87,6 @@ tasks.withType<Test> {
     useJUnit()
     finalizedBy("jacocoTestReport")
 }
-
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
 
@@ -96,20 +95,36 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    val mainSrc = "${project.projectDir}/src/main/java"
+    // سورس‌های Java + Kotlin
+    val mainSrc = files(
+        "${project.projectDir}/src/main/java",
+        "${project.projectDir}/src/main/kotlin"
+    )
 
-    val debugTree = fileTree("${buildDir}/intermediates/javac/debug/classes") {
-        exclude(
-            "**/R.class",
-            "**/R$*.class",
-            "**/BuildConfig.*",
-            "**/Manifest*.*",
-            "**/*Test*.*"
-        )
-    }
+    // کلاس‌های خروجی Kotlin + Java (برای AGP 8+ هر دو مسیر رو پوشش می‌دیم)
+    val debugTree = files(
+        fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+            exclude(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*"
+            )
+        },
+        fileTree("${buildDir}/intermediates/javac/debug/classes") {
+            exclude(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*",
+                "**/*Test*.*"
+            )
+        }
+    )
 
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
+    sourceDirectories.setFrom(mainSrc)
+    classDirectories.setFrom(debugTree)
     executionData.setFrom(fileTree(buildDir) {
         include("**/*.exec", "**/*.ec")
     })
