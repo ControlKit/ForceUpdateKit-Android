@@ -3,9 +3,11 @@ import javax.xml.parsers.DocumentBuilderFactory
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.compose") version "2.2.10"
+    alias(libs.plugins.kotlin.compose)
     id("jacoco")
 }
+
+version = "0.0.2"
 
 android {
     namespace = "com.forceupdatekit"
@@ -15,6 +17,8 @@ android {
         minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("int", "LIB_VERSION_CODE", "2")
+        buildConfigField("String", "LIB_VERSION_NAME", "\"${project.version}\"")
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables {
             useSupportLibrary = true
@@ -44,7 +48,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-
+    buildFeatures {
+        buildConfig = true
+    }
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
@@ -52,6 +58,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.material3)
+    implementation(libs.errorhandler)
 
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -84,7 +91,6 @@ jacoco {
 }
 
 tasks.withType<Test> {
-    // چون تست‌ها JUnit4 هستن
     useJUnit()
     finalizedBy("jacocoTestReport")
 }
@@ -97,13 +103,11 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 
-    // سورس‌های Java + Kotlin
     val mainSrc = files(
         "${project.projectDir}/src/main/java",
         "${project.projectDir}/src/main/kotlin"
     )
 
-    // کلاس‌های خروجی Kotlin + Java (برای AGP 8+ هر دو مسیر رو پوشش می‌دیم)
     val debugTree = files(
         fileTree("${buildDir}/tmp/kotlin-classes/debug") {
             exclude(

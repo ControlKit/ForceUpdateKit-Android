@@ -2,11 +2,14 @@ package com.forceupdatekit.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.forceupdatekit.BuildConfig
 import com.forceupdatekit.config.ForceUpdateServiceConfig
 import com.forceupdatekit.service.ForceUpdateApi
 import com.forceupdatekit.service.apiError.NetworkResult
 import com.forceupdatekit.service.model.toDomain
 import com.forceupdatekit.view.viewmodel.state.ForceUpdateState
+import com.forceupdatekit.service.apiError.model.ErrorValidation
+import com.sepanta.errorhandler.ErrorEntityRegistry
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,12 +20,17 @@ import kotlinx.coroutines.launch
 class ForceUpdateViewModel(
     private val api: ForceUpdateApi,
 ) : ViewModel() {
+    private val url = "https://tauri.ir/api/force-updates"
+    fun setupErrorEntities() {
+        ErrorEntityRegistry.register(ErrorValidation::class.java)
+    }
     private var config: ForceUpdateServiceConfig? = null
     fun setConfig(config: ForceUpdateServiceConfig) {
         this.config = config
-        getData()
+        setupErrorEntities()
     }
 
+    private var itemId: String? = null
     private val _mutableState = MutableStateFlow<ForceUpdateState>(ForceUpdateState.Initial)
     val state: StateFlow<ForceUpdateState> = _mutableState.asStateFlow()
 
@@ -35,20 +43,48 @@ class ForceUpdateViewModel(
         _mutableState.value = ForceUpdateState.Initial
     }
 
-    fun getData() {
-        if (state.value != ForceUpdateState.Initial || config == null) return
+    fun sendAction(action: String) {
+        if (itemId == null) return
         viewModelScope.launch {
-            val data = api.getForceUpdateData(
-                config!!.route,
+            val data = api.setAction(
+                url + "/${itemId}",
                 config!!.appId,
                 config!!.version,
                 config!!.deviceId,
-                config!!.sdkVersion
+                BuildConfig.LIB_VERSION_NAME,
+                action,
+            )
+            when (data) {
+                is NetworkResult.Success -> {
+                    if (action== Actions.UPDATE.value)
+                    _mutableState.value = ForceUpdateState.Update
+                }
+
+                is NetworkResult.Error -> {
+                    if (action== Actions.UPDATE.value)
+                    _mutableState.value = ForceUpdateState.UpdateError(data.error)
+                }
+            }
+
+        }
+    }
+
+    fun getData() {
+        if (config == null) return
+        viewModelScope.launch {
+            val data = api.getForceUpdateData(
+                url,
+                config!!.appId,
+                config!!.version,
+                config!!.deviceId,
+                BuildConfig.LIB_VERSION_NAME
             )
             when (data) {
                 is NetworkResult.Success -> {
                     if (data.value != null) {
-                        _mutableState.value = ForceUpdateState.Update(data.value.toDomain())
+                        _mutableState.value = ForceUpdateState.ShowView(data.value.toDomain(config?.lang))
+                        itemId = data.value.data.id
+                        sendAction(Actions.VIEW.value)
                     } else {
                         _mutableState.value = ForceUpdateState.NoUpdate
                     }
@@ -58,7 +94,7 @@ class ForceUpdateViewModel(
                     if (config!!.skipException) {
                         _mutableState.value = ForceUpdateState.SkipError
                     } else {
-                        _mutableState.value = ForceUpdateState.Error(data.error)
+                        _mutableState.value = ForceUpdateState.ShowViewError(data.error)
 
                     }
                 }
@@ -80,6 +116,13 @@ class ForceUpdateViewModel(
         triggerForceUpdate()
     }
 
+    fun submit() {
+        sendAction(Actions.UPDATE.value)
+        _openDialog.value = false
+        clearState()
+        triggerForceUpdate()
+
+    }
 
     private val _forceUpdateEvent = Channel<Unit>(Channel.BUFFERED)
     val forceUpdateEvent = _forceUpdateEvent.receiveAsFlow()

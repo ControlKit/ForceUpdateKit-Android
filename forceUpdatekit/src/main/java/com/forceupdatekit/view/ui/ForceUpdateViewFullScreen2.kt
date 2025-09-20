@@ -47,7 +47,7 @@ class ForceUpdateViewFullScreen2 : ForceUpdateViewContract {
         viewModel: ForceUpdateViewModel
     ) {
         val openDialog = viewModel.openDialog.collectAsState()
-        if (openDialog.value) return
+        if (!openDialog.value) return
         Dialog(
             onDismissRequest = { viewModel.dismissDialog() },
             properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -193,8 +193,7 @@ class ForceUpdateViewFullScreen2 : ForceUpdateViewContract {
         ) {
             val onClickAction: () -> Unit = {
                 openLink(response.linkUrl, uriHandler)
-                viewModel.dismissDialog()
-                viewModel.clearState()
+                viewModel.submit()
             }
 
             config.buttonView?.let { button ->

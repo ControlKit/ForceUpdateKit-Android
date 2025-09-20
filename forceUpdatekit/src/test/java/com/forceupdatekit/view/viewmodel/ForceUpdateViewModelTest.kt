@@ -86,9 +86,8 @@ class ForceUpdateViewModelTest {
         advanceUntilIdle()
 
         val s1 = viewModel.state.value
-        assert(s1 is ForceUpdateState.Update)
+        assert(s1 is ForceUpdateState.ShowView)
 
-        // call again: چون state دیگه Initial نیست نباید دوباره API صدا بخوره
         viewModel.setConfig(baseConfig)
         advanceUntilIdle()
         coVerify(exactly = 1) { api.getForceUpdateData(any(), any(), any(), any(),any()) }
@@ -137,7 +136,7 @@ class ForceUpdateViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.state.value
-        assert(state is ForceUpdateState.Update)
+        assert(state is ForceUpdateState.ShowView)
     }
 
     @Test
@@ -159,7 +158,7 @@ class ForceUpdateViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.state.value
-        assertTrue(state is ForceUpdateState.Error)
+        assertTrue(state is ForceUpdateState.ShowViewError)
     }
 
     @Test
@@ -178,8 +177,8 @@ class ForceUpdateViewModelTest {
     fun `SkipError then tryAgain should fetch again and update state`() = runTest(dispatcher) {
         val apiError = ApiError("Temporary", 0, ApiError.ErrorStatus.UNKNOWN_ERROR)
         coEvery { api.getForceUpdateData(any(), any(), any(), any(), any()) } returnsMany listOf(
-            NetworkResult.Error(apiError),      // بار اول: خطا → SkipError
-            NetworkResult.Success(null)         // بار دوم: موفق ولی بدنه null → NoUpdate
+            NetworkResult.Error(apiError),
+            NetworkResult.Success(null)
         )
 
         val cfg = baseConfig.copy(skipException = true)
@@ -275,9 +274,9 @@ class ForceUpdateViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.state.value
-        assertTrue(state is ForceUpdateState.Update)
+        assertTrue(state is ForceUpdateState.ShowView)
 
-        val updateState = state as ForceUpdateState.Update
+        val updateState = state as ForceUpdateState.ShowView
         assertEquals("New Version", updateState.data?.title)
     }
 
@@ -307,9 +306,9 @@ class ForceUpdateViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.state.value
-        assertTrue(state is ForceUpdateState.Update)
+        assertTrue(state is ForceUpdateState.ShowView)
 
-        val updateState = state as ForceUpdateState.Update
+        val updateState = state as ForceUpdateState.ShowView
         assertEquals(null, updateState.data?.version)
         assertEquals(null, updateState.data?.title)
         assertEquals(null, updateState.data?.forceUpdate)

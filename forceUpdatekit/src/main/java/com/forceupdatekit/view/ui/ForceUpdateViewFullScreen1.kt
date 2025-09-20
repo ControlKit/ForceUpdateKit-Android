@@ -44,7 +44,7 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
         viewModel: ForceUpdateViewModel
     ) {
         val openDialog = viewModel.openDialog.collectAsState()
-        if (openDialog.value) return
+        if (!openDialog.value) return
         Dialog(
             onDismissRequest = { viewModel.dismissDialog() },
 
@@ -124,7 +124,6 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
                     end = 15.dp, start = 15.dp
                 )
                 .wrapContentSize(), contentAlignment = Alignment.Center
-
         ) {
             config.descriptionTitleView?.let { textView ->
                 textView((response.description ?: config.descriptionTitle))
@@ -132,12 +131,8 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
                 text = response.description ?: config.descriptionTitle,
                 style = Typography.titleSmall,
                 color = config.descriptionTitleColor ?: Typography.titleSmall.color
-
             )
-
-
         }
-
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -152,15 +147,11 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
         Box(
             modifier = config.buttonLayoutModifier ?: modifier.fillMaxSize(),
             contentAlignment = Alignment.TopCenter
-
         ) {
-
             val onClickAction: () -> Unit = {
                 openLink(response.linkUrl, uriHandler)
-                viewModel.dismissDialog()
-                viewModel.clearState()
+                viewModel.submit()
             }
-
             config.buttonView?.let { button ->
                 button(onClickAction)
             } ?: Button(
@@ -177,10 +168,7 @@ class ForceUpdateViewFullScreen1 : ForceUpdateViewContract {
                     style = Typography.titleMedium
                 )
             }
-
         }
-
     }
-
 
 }

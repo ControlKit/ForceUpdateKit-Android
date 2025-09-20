@@ -12,8 +12,9 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 
-private val TIME_OUT = 2L
-private val MAX_RETRY = 3
+private var TIME_OUT = 2000L
+private var  TIME_RETRY_THREAD_SLEEP = 2000L
+private var MAX_RETRY = 6
 
 object RetrofitClientInstance {
     private var retrofit: Retrofit? = null
@@ -21,18 +22,22 @@ object RetrofitClientInstance {
     val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
-    val retrofitInstance: Retrofit?
-        get() {
-            if (retrofit == null) {
-                retrofit = Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(createOkHttpClient())
-                    .addCallAdapterFactory(ThrowOnHttpErrorCallAdapterFactory())
-                    .build()
-            }
-            return retrofit
+
+
+    fun getRetrofitInstance(timeOut: Long = 3000L, maxRetry: Int = 3,timeRetryThreadSleep:Long = 5L): Retrofit? {
+        MAX_RETRY = maxRetry
+        TIME_OUT = timeOut
+        TIME_RETRY_THREAD_SLEEP = timeRetryThreadSleep
+        if (retrofit == null) {
+            retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(createOkHttpClient())
+                .addCallAdapterFactory(ThrowOnHttpErrorCallAdapterFactory())
+                .build()
         }
+        return retrofit
+    }
 
 }
 
@@ -51,17 +56,21 @@ private fun createOkHttpClient(): OkHttpClient {
 
         while (tryCount <= MAX_RETRY) {
             try {
-
                 val respons = chain.proceed(request)
-
-                return@Interceptor respons
+                if (respons.isSuccessful) {
+                    return@Interceptor respons
+                } else {
+                    tryCount++
+                    if (tryCount > MAX_RETRY) break
+                    Thread.sleep(TIME_RETRY_THREAD_SLEEP)
+                }
 
             } catch (e: Exception) {
                 if (e is UnknownHostException || e is SocketTimeoutException || e is ConnectException) {
                     lastException = e
                     tryCount++
                     if (tryCount > MAX_RETRY) break
-                    Thread.sleep(2000)
+                    Thread.sleep(TIME_RETRY_THREAD_SLEEP)
                 } else {
                     throw e
                 }

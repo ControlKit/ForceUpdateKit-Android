@@ -60,7 +60,7 @@ class LocalizationTest {
                 created_at = "2025-01-01"
             )
         )
-        val d = api.toDomain()
+        val d = api.toDomain(config.lang)
         assertEquals("1", d.id)
         assertEquals("2.0.0", d.version)
         assertEquals(null, d.title) // چون title=null

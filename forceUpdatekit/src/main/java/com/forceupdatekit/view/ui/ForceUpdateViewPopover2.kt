@@ -42,7 +42,7 @@ class ForceUpdateViewPopover2 : ForceUpdateViewContract {
     override fun ShowView(config: ForceUpdateViewConfig, response: CheckUpdateResponse,viewModel: ForceUpdateViewModel) {
 
         val openDialog = viewModel.openDialog.collectAsState()
-        if (openDialog.value) return
+        if (!openDialog.value) return
         Dialog(
             onDismissRequest = { viewModel.dismissDialog() }) {
             Surface(
@@ -166,8 +166,7 @@ class ForceUpdateViewPopover2 : ForceUpdateViewContract {
 
         val onClickAction: () -> Unit = {
             openLink(response.linkUrl, uriHandler)
-            viewModel.dismissDialog()
-            viewModel.clearState()
+            viewModel.submit()
         }
         config.buttonView?.let { button ->
             button(onClickAction)
