@@ -7,7 +7,7 @@ plugins {
     id("jacoco")
 }
 
-version = "0.0.2"
+version = "0.0.3"
 
 android {
     namespace = "com.forceupdatekit"
@@ -17,7 +17,7 @@ android {
         minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("int", "LIB_VERSION_CODE", "2")
+        buildConfigField("int", "LIB_VERSION_CODE", "3")
         buildConfigField("String", "LIB_VERSION_NAME", "\"${project.version}\"")
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables {
