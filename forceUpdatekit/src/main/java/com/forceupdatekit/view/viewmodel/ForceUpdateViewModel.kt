@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class ForceUpdateViewModel(
     private val api: ForceUpdateApi,
 ) : ViewModel() {
-    private val url = "https://tauri.ir/api/force-updates"
+    private val url = ""
     fun setupErrorEntities() {
         ErrorEntityRegistry.register(ErrorValidation::class.java)
     }

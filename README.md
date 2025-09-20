@@ -331,7 +331,7 @@ sealed class ForceUpdateState {
 ## 🔌 API Integration
 
 The library integrates with your backend API at:
-- **Base URL**: `https://tauri.ir/api/force-updates`
+- **Base URL**: `https://example/force-updates`
 - **Check Update**: `GET /force-updates`
 - **Send Action**: `POST /force-updates/{id}`
 
