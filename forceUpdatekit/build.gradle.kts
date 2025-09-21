@@ -110,6 +110,34 @@ tasks.withType<Test> {
 
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
+    
+    // Add explicit dependencies to fix Gradle validation issues
+    mustRunAfter("generateDebugAndroidTestResValues")
+    mustRunAfter("syncDebugLibJars")
+    mustRunAfter("syncReleaseLibJars")
+    mustRunAfter("generateDebugAndroidTestLintModel")
+    mustRunAfter("lintAnalyzeDebugAndroidTest")
+    mustRunAfter("mergeReleaseResources")
+    mustRunAfter("extractProguardFiles")
+    mustRunAfter("mergeDebugJavaResource")
+    mustRunAfter("mergeDebugJniLibFolders")
+    mustRunAfter("mergeReleaseJniLibFolders")
+    mustRunAfter("mergeReleaseJavaResource")
+    mustRunAfter("copyDebugJniLibsProjectAndLocalJars")
+    mustRunAfter("copyReleaseJniLibsProjectAndLocalJars")
+    mustRunAfter("copyDebugJniLibsProjectOnly")
+    mustRunAfter("copyReleaseJniLibsProjectOnly")
+    mustRunAfter("generateDebugLintModel")
+    mustRunAfter("generateReleaseLintModel")
+    mustRunAfter("lintAnalyzeDebug")
+    mustRunAfter("generateDebugLintReportModel")
+    mustRunAfter("generateReleaseLintVitalModel")
+    mustRunAfter("lintVitalAnalyzeRelease")
+    mustRunAfter("bundleLibRuntimeToDirDebug")
+    mustRunAfter("bundleLibRuntimeToDirRelease")
+    mustRunAfter("generateDebugUnitTestLintModel")
+    mustRunAfter("lintAnalyzeDebugUnitTest")
+    mustRunAfter("verifyReleaseResources")
 
     reports {
         xml.required.set(true)
