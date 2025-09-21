@@ -95,6 +95,7 @@ ForceUpdateKit/
 | **OkHttp** | 5.1.0 | Network layer |
 | **Gson** | 2.9.0 | JSON serialization |
 | **Coil** | 2.7.0 | Image loading |
+| **Error Handler** | External | Error management library |
 
 ### Architecture Patterns
 
@@ -102,6 +103,7 @@ ForceUpdateKit/
 - **Repository Pattern**: Centralized data access
 - **StateFlow**: Reactive state management
 - **Dependency Injection**: Loose coupling between components
+- **External Error Handling**: Centralized error management
 
 ### Testing Framework
 
@@ -154,17 +156,28 @@ ForceUpdateKit/
 ### Endpoints
 
 ```
-Base URL: https://tauri.ir/api/force-updates
+Base URL: Configurable via local.properties
 
 GET  /force-updates          # Check for updates
 POST /force-updates/{id}     # Send user actions
+```
+
+**Configuration:**
+```properties
+# local.properties
+API_URL="https://your-api-domain.com/api/force-updates"
 ```
 
 ### Request/Response Format
 
 ```json
 // Check Update Request
-GET /force-updates?appId={appId}&version={version}&deviceId={deviceId}&sdkVersion={sdkVersion}
+GET /force-updates
+Headers:
+  - x-app-id: {appId}
+  - x-version: {version}
+  - x-sdk-version: {sdkVersion}
+  - x-device-uuid: {deviceId}
 
 // Response
 {
@@ -221,6 +234,7 @@ GET /force-updates?appId={appId}&version={version}&deviceId={deviceId}&sdkVersio
 - **No Sensitive Data**: No personal information stored
 - **Input Validation**: Sanitized user inputs
 - **Error Handling**: Secure error messages
+- **Header-based Authentication**: Secure API authentication
 
 ### Privacy Compliance
 
@@ -253,18 +267,21 @@ GET /force-updates?appId={appId}&version={version}&deviceId={deviceId}&sdkVersio
 - Offline support
 - Custom animation support
 - Additional UI themes
+- Improved error handling integration
 
 ### Version 0.0.4 (Planned)
 - Advanced analytics integration
 - A/B testing support
 - Custom update strategies
 - Enhanced error recovery
+- Custom API endpoint configuration
 
 ### Version 1.0.0 (Future)
 - Stable API with long-term support
 - Advanced customization options
 - Enterprise features
 - Multi-platform support
+- Full error handling library integration
 
 ## 🤝 Community & Support
 
@@ -297,6 +314,7 @@ GET /force-updates?appId={appId}&version={version}&deviceId={deviceId}&sdkVersio
 - **Performance**: <2% crash rate
 - **Documentation**: 95% API coverage
 - **Testing**: 90%+ test coverage
+- **Error Handling**: 100% error coverage
 
 ---
 

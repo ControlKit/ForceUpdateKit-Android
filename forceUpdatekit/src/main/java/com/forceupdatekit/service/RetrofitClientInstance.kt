@@ -1,5 +1,6 @@
 package com.forceupdatekit.service
 
+import com.forceupdatekit.BuildConfig
 import com.forceupdatekit.service.RetrofitClientInstance.logging
 import com.forceupdatekit.service.apiError.ThrowOnHttpErrorCallAdapterFactory
 import okhttp3.Interceptor
@@ -18,7 +19,7 @@ private var MAX_RETRY = 6
 
 object RetrofitClientInstance {
     private var retrofit: Retrofit? = null
-    private const val BASE_URL = "https://tauri.ir/api/"
+    private val BASE_URL = BuildConfig.API_URL+"/"
     val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }

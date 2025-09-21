@@ -175,13 +175,15 @@ data class CheckUpdateResponse(
 
 ## ApiError
 
-Data class representing API errors.
+Data class representing API errors. Uses the external error handling library.
 
 ```kotlin
-data class ApiError(
+// From com.sepanta.errorhandler.ApiError
+data class ApiError<T>(
     val message: String? = null,
     val code: Int? = null,
-    val details: String? = null
+    val details: String? = null,
+    val data: T? = null
 )
 ```
 

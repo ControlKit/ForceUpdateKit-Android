@@ -15,11 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Analytics tracking for VIEW and UPDATE actions
 - Comprehensive unit and UI tests
 - JaCoCo code coverage reporting
+- External error handling library integration
+- Header-based API authentication
+- Configurable API URL via local.properties
 
 ### Changed
 - Improved API response handling
 - Enhanced error states management
 - Better state flow architecture
+- API parameters moved from query to headers
+- Base URL now configurable via local.properties
+- Error handling now uses external library
 
 ### Fixed
 - Memory leaks in ViewModel

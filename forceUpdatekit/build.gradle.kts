@@ -1,4 +1,5 @@
 import javax.xml.parsers.DocumentBuilderFactory
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
@@ -17,12 +18,24 @@ android {
         minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        
         buildConfigField("int", "LIB_VERSION_CODE", "3")
         buildConfigField("String", "LIB_VERSION_NAME", "\"${project.version}\"")
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables {
             useSupportLibrary = true
         }
+        
+        // Load API URL from local.properties
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { localProperties.load(it) }
+        }
+        
+        val apiUrl = localProperties.getProperty("API_URL") ?: "https://example.com/api/force-updates"
+        buildConfigField("String", "API_URL", "\"$apiUrl\"")
     }
     buildFeatures {
         compose = true

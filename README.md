@@ -330,8 +330,13 @@ sealed class ForceUpdateState {
 
 ## 🔌 API Integration
 
-The library integrates with your backend API at:
-- **Base URL**: `https://example/force-updates`
+The library integrates with your backend API. The base URL is configurable through `local.properties`:
+
+```properties
+# local.properties
+API_URL="https://your-api-domain.com/api/force-updates"
+```
+
 - **Check Update**: `GET /force-updates`
 - **Send Action**: `POST /force-updates/{id}`
 
@@ -339,17 +344,22 @@ The library integrates with your backend API at:
 
 ```kotlin
 // Check Update Request
-GET /force-updates?appId={appId}&version={version}&deviceId={deviceId}&sdkVersion={sdkVersion}
+GET /force-updates
+Headers:
+  - x-app-id: {appId}
+  - x-version: {version}
+  - x-sdk-version: {sdkVersion}
+  - x-device-uuid: {deviceId}
 
 // Send Action Request
 POST /force-updates/{id}
-Body: {
-    "appId": "your-app-id",
-    "version": "1.0.0",
-    "deviceId": "device-id",
-    "sdkVersion": "0.0.2",
-    "action": "VIEW" | "UPDATE"
-}
+Headers:
+  - x-app-id: {appId}
+  - x-version: {version}
+  - x-sdk-version: {sdkVersion}
+  - x-device-uuid: {deviceId}
+Body:
+  - action: "VIEW" | "UPDATE"
 ```
 
 ### Response Format

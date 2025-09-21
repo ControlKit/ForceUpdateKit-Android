@@ -33,7 +33,7 @@ ForceUpdateServiceConfig(
 ```
 
 #### 2. State Management
-State handling has been improved with better error management.
+State handling has been improved with better error management and external error handling library.
 
 **Before (0.0.1):**
 ```kotlin
@@ -57,7 +57,35 @@ onState = { state ->
 }
 ```
 
-#### 3. UI Customization
+**Note**: Error types now use `com.sepanta.errorhandler.ApiError<*>` instead of custom error types.
+
+#### 3. API Integration Changes
+API integration has been updated with new authentication method and configurable base URL.
+
+**Before (0.0.1):**
+```kotlin
+// Query parameters
+GET /force-updates?appId={appId}&version={version}&deviceId={deviceId}&sdkVersion={sdkVersion}
+```
+
+**After (0.0.2):**
+```kotlin
+// Header-based authentication
+GET /force-updates
+Headers:
+  - x-app-id: {appId}
+  - x-version: {version}
+  - x-sdk-version: {sdkVersion}
+  - x-device-uuid: {deviceId}
+```
+
+**Configuration:**
+```properties
+# local.properties
+API_URL="https://your-api-domain.com/api/force-updates"
+```
+
+#### 4. UI Customization
 UI customization has been enhanced with more options.
 
 **Before (0.0.1):**
@@ -83,7 +111,30 @@ ForceUpdateServiceConfig(
 
 ### New Features
 
-#### 1. Multiple UI Styles
+#### 1. External Error Handling Library
+Integration with `com.sepanta.errorhandler` for better error management:
+
+```kotlin
+// Automatic error entity registration
+fun setupErrorEntities() {
+    ErrorEntityRegistry.register(ErrorValidation::class.java)
+}
+```
+
+#### 2. Configurable API URL
+API URL is now configurable via `local.properties`:
+
+```properties
+# local.properties
+API_URL="https://your-api-domain.com/api/force-updates"
+```
+
+**Benefits:**
+- Easy environment switching (dev, staging, production)
+- No hardcoded URLs in source code
+- Secure configuration management
+
+#### 3. Multiple UI Styles
 Six different UI styles are now available:
 
 ```kotlin
@@ -92,7 +143,7 @@ ForceUpdateViewConfig(
 )
 ```
 
-#### 2. Multi-language Support
+#### 4. Multi-language Support
 Support for localized content:
 
 ```kotlin
@@ -101,7 +152,7 @@ ForceUpdateServiceConfig(
 )
 ```
 
-#### 3. Custom Views
+#### 5. Custom Views
 Advanced customization with custom Composable views:
 
 ```kotlin
@@ -120,7 +171,7 @@ ForceUpdateViewConfig(
 )
 ```
 
-#### 4. Enhanced Error Handling
+#### 6. Enhanced Error Handling
 Better error management with retry mechanisms:
 
 ```kotlin
@@ -138,7 +189,13 @@ ForceUpdateServiceConfig(
    implementation 'com.github.ControlKit:ForceUpdateKit-Android:0.0.2'
    ```
 
-2. **Update Configuration**
+2. **Configure API URL**
+   ```properties
+   # local.properties
+   API_URL="https://your-api-domain.com/api/force-updates"
+   ```
+
+3. **Update Configuration**
    ```kotlin
    // Wrap existing config in viewConfig
    ForceUpdateServiceConfig(
@@ -151,7 +208,7 @@ ForceUpdateServiceConfig(
    )
    ```
 
-3. **Update State Handling**
+4. **Update State Handling**
    ```kotlin
    onState = { state ->
        when (state) {
@@ -174,7 +231,7 @@ ForceUpdateServiceConfig(
    }
    ```
 
-4. **Test Your Implementation**
+5. **Test Your Implementation**
    - Verify all states are handled correctly
    - Test error scenarios
    - Ensure UI displays properly
@@ -187,6 +244,8 @@ The following features from 0.0.1 are deprecated and will be removed in future v
 - Direct configuration properties (moved to `viewConfig`)
 - Simple state handling (replaced with comprehensive state management)
 - Basic error handling (replaced with enhanced error management)
+- Query parameter-based API authentication (replaced with header-based authentication)
+- Custom error types (replaced with external error handling library)
 
 ### Troubleshooting
 
@@ -204,6 +263,9 @@ The following features from 0.0.1 are deprecated and will be removed in future v
    - Verify API endpoint is accessible
    - Check network permissions
    - Ensure proper error handling
+   - Verify header-based authentication is working
+   - Check external error handling library integration
+   - Verify API_URL is correctly set in local.properties
 
 #### Getting Help
 
