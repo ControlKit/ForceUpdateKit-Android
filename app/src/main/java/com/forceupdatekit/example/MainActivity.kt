@@ -32,9 +32,7 @@ class MainActivity : ComponentActivity() {
                    val kit= forceUpdateKitHost(
                         ForceUpdateServiceConfig(
                             version = "1.0.0",
-                            appId = "9fec5078-656e-489d-97fd-56c0f628394a",
-                            deviceId = "dsd1",
-                            timeRetryThreadSleep = 20000L,
+                            appId = "9fee1663-e80e-46ad-8cd9-357263375a9c",
                             viewConfig = ForceUpdateViewConfig(
                                 ForceUpdateViewStyle.Popover2,
                             )

@@ -50,7 +50,7 @@ class ForceUpdateViewModel(
                 url + "/${itemId}",
                 config!!.appId,
                 config!!.version,
-                config!!.deviceId,
+                config!!.deviceId?:"",
                 BuildConfig.LIB_VERSION_NAME,
                 action,
             )
@@ -76,7 +76,7 @@ class ForceUpdateViewModel(
                 url,
                 config!!.appId,
                 config!!.version,
-                config!!.deviceId,
+                config!!.deviceId?:"",
                 BuildConfig.LIB_VERSION_NAME
             )
             when (data) {

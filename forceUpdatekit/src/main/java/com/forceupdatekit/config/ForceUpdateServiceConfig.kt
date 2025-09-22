@@ -6,7 +6,7 @@ data class ForceUpdateServiceConfig(
     var viewConfig: ForceUpdateViewConfig = ForceUpdateViewConfig(),
     var version: String,
     var appId: String,
-    var deviceId: String = "1",
+    var deviceId: String ?=null,
     var skipException: Boolean = false,
     var timeOut: Long = 5000L,
     var timeRetryThreadSleep: Long = 1000L,

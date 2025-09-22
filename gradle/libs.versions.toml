@@ -18,6 +18,7 @@ material = "1.13.0"
 okhttp = "5.1.0"
 retrofit = "3.0.0"
 lifecycleViewmodelAndroid = "2.9.4"
+securityCrypto = "1.1.0"
 uiToolingPreview = "1.9.1"
 uiTooling = "1.9.1"
 kotlinxCoroutinesTest = "1.10.2"
@@ -27,6 +28,7 @@ turbine = "1.2.1"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 errorhandler = { module = "com.github.Morteza-Sakiyan:ErrorHandler", version.ref = "errorhandler" }

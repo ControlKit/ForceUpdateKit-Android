@@ -80,10 +80,7 @@ Headers:
 ```
 
 **Configuration:**
-```properties
-# local.properties
-API_URL="https://your-api-domain.com/api/force-updates"
-```
+Example base URL: `https://example.com/api/force-updates`
 
 #### 4. UI Customization
 UI customization has been enhanced with more options.
@@ -122,12 +119,7 @@ fun setupErrorEntities() {
 ```
 
 #### 2. Configurable API URL
-API URL is now configurable via `local.properties`:
-
-```properties
-# local.properties
-API_URL="https://your-api-domain.com/api/force-updates"
-```
+API base URL is configurable per environment (dev/staging/prod). Use your own configuration mechanism. Example: `https://example.com/api/force-updates`.
 
 **Benefits:**
 - Easy environment switching (dev, staging, production)
@@ -190,10 +182,7 @@ ForceUpdateServiceConfig(
    ```
 
 2. **Configure API URL**
-   ```properties
-   # local.properties
-   API_URL="https://your-api-domain.com/api/force-updates"
-   ```
+   Set your base URL via your preferred configuration. Example: `https://example.com/api/force-updates`.
 
 3. **Update Configuration**
    ```kotlin
@@ -265,7 +254,7 @@ The following features from 0.0.1 are deprecated and will be removed in future v
    - Ensure proper error handling
    - Verify header-based authentication is working
    - Check external error handling library integration
-   - Verify API_URL is correctly set in local.properties
+   - Verify API base URL is correctly configured
 
 #### Getting Help
 

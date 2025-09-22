@@ -156,17 +156,14 @@ ForceUpdateKit/
 ### Endpoints
 
 ```
-Base URL: Configurable via local.properties
+Base URL: e.g., https://example.com/api/force-updates
 
 GET  /force-updates          # Check for updates
 POST /force-updates/{id}     # Send user actions
 ```
 
 **Configuration:**
-```properties
-# local.properties
-API_URL="https://your-api-domain.com/api/force-updates"
-```
+Provide your base URL via your environment/config system (e.g., `https://example.com/api/force-updates`).
 
 ### Request/Response Format
 

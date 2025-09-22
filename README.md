@@ -330,12 +330,7 @@ sealed class ForceUpdateState {
 
 ## 🔌 API Integration
 
-The library integrates with your backend API. The base URL is configurable through `local.properties`:
-
-```properties
-# local.properties
-API_URL="https://your-api-domain.com/api/force-updates"
-```
+The library integrates with your backend API. Example base URL: `https://example.com/api/force-updates`
 
 - **Check Update**: `GET /force-updates`
 - **Send Action**: `POST /force-updates/{id}`
@@ -429,14 +424,7 @@ Add to your `AndroidManifest.xml`:
 version = "1.2.3"  // Major.Minor.Patch
 ```
 
-### 2. Device ID Generation
-```kotlin
-// Generate unique device ID
-val deviceId = Settings.Secure.getString(
-    contentResolver,
-    Settings.Secure.ANDROID_ID
-)
-```
+
 
 ### 3. Error Handling
 ```kotlin

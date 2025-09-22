@@ -5,7 +5,6 @@ import com.forceupdatekit.service.model.ApiCheckUpdateResponse
 import com.forceupdatekit.service.model.ApiData
 import com.forceupdatekit.service.model.LocalizedText
 import com.forceupdatekit.service.model.SendActionResponse
-import com.sepanta.errorhandler.ApiError
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

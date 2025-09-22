@@ -1,5 +1,7 @@
-package com.forceupdatekit.service.apiError.model
+package com.forceupdatekit.service.apierror.model
 
+import com.forceupdatekit.service.apiError.model.ErrorValidation
+import com.forceupdatekit.service.apiError.model.ValidationErrors
 import com.sepanta.errorhandler.IErrorEntity
 import org.junit.Assert.*
 import org.junit.Test

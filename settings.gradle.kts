@@ -12,11 +12,6 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             url = uri("https://jitpack.io")
-            credentials {
-
-                username = providers.gradleProperty("gpr.user").orNull ?: ""
-                password = providers.gradleProperty("gpr.key").orNull ?: ""
-            }
         }
     }
 }

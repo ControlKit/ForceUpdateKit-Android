@@ -1,4 +1,3 @@
-import javax.xml.parsers.DocumentBuilderFactory
 import java.util.Properties
 
 plugins {
@@ -27,7 +26,6 @@ android {
             useSupportLibrary = true
         }
         
-        // Load API URL from local.properties
         val localProperties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
@@ -72,7 +70,7 @@ android {
 dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.errorhandler)
-
+    implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.core.ktx)
