@@ -15,7 +15,7 @@ class ForceUpdateServiceConfigTest {
 
         assertEquals("1.0.0", config.version)
         assertEquals("test-app-id", config.appId)
-        assertEquals("1", config.deviceId)
+        assertEquals(null, config.deviceId)
         assertEquals(false, config.skipException)
         assertEquals(5000L, config.timeOut)
         assertEquals(1000L, config.timeRetryThreadSleep)
