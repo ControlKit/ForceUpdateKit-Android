@@ -4,6 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![API](https://img.shields.io/badge/API-26%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=26)
 [![codecov](https://codecov.io/gh/ControlKit/ForceUpdateKit-Android/branch/main/graph/badge.svg)](https://codecov.io/gh/ControlKit/ForceUpdateKit-Android)
+[![iOS](https://img.shields.io/badge/iOS-Version-blue.svg)](https://github.com/ControlKit/ForceUpdateKit)
 
 A powerful and customizable Android library for managing force updates in your applications. Built with Jetpack Compose and modern Android architecture patterns.
 
@@ -17,10 +18,6 @@ A powerful and customizable Android library for managing force updates in your a
 - 📊 **Analytics Ready** - Built-in action tracking (VIEW, UPDATE)
 - 🚀 **Easy Integration** - Simple setup with minimal code
 - 💪 **Error Handling** - Robust error management with retry mechanisms
-
-## 🍎 iOS Version
-
-Looking for the iOS library? Visit the ForceUpdateKit (iOS) repository on GitHub: [ControlKit/ForceUpdateKit](https://github.com/ControlKit/ForceUpdateKit)
 
 ## 📦 Installation
 
