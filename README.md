@@ -17,6 +17,10 @@ A powerful and customizable Android library for managing force updates in your a
 - 🚀 **Easy Integration** - Simple setup with minimal code
 - 💪 **Error Handling** - Robust error management with retry mechanisms
 
+## 📊 Code Coverage
+
+[![codecov](https://codecov.io/gh/ControlKit/ForceUpdateKit-Android/branch/main/graph/badge.svg)](https://codecov.io/gh/ControlKit/ForceUpdateKit-Android)
+
 ## 🍎 iOS Version
 
 Looking for the iOS library? Visit the ForceUpdateKit (iOS) repository on GitHub: [ControlKit/ForceUpdateKit](https://github.com/ControlKit/ForceUpdateKit)
